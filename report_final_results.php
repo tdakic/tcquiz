@@ -31,6 +31,8 @@ require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/report/reportlib.php');
 
+global $DB;
+
 $id = optional_param('id', 0, PARAM_INT);
 $q = optional_param('quizid', 0, PARAM_INT);
 $sessionid = optional_param('tcqsid', 0, PARAM_INT);

@@ -139,25 +139,31 @@ function tcquiz_is_running($status) {
     return ($status > TCQUIZ_STATUS_NOTRUNNING && $status < TCQUIZ_STATUS_FINALRESULTS);
 }
 
-function tcquiz_get_final_results($quiz){
+function tcquiz_get_final_results($sessionid,$cmid,$quizid){
   global $CFG;
   //$quiz->status = TCQUIZ_STATUS_FINALRESULTS;
   //$DB->update_record('tcquiz', $quiz); // FIXME - not update all fields?
 
   //tcquiz_send_final_results($quizid);
+  //$url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php',['page' => $session->currentpage, 'showall' => 0, 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $session->id, 'sesskey' => $USER->sesskey ]));
+
   sleep(2);
+  tcquiz_start_response();
   echo '<status>finalresults</status>';
   echo '<classresult>';
-  $_GET["id"]=$quiz->cmid;
+  $_GET["id"]=$cmid;
+  $_GET["tcqsid"]=$sessionid;
   //$_GET["mode"]="no-cors";
   $_GET["mode"]="overview";
   echo "<url>";
-  echo $CFG->dirroot.'/mod/quiz/accessrule/tcquiz/report_final_results.php';
+  echo htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/report_final_results.php',['mode' => 'overview', 'id' =>$cmid, 'tcqsid' => $sessionid, 'quizid'=>$quizid ]));
+  //echo $CFG->dirroot.'/mod/quiz/accessrule/tcquiz/report_final_results.php?mode=overview&id='.$cmid.'&tcquiz='.$sessionid;
   echo "</url>";
   //$tmp = include($CFG->dirroot.'/mod/tcquiz/report_final_results.php');
-  $tmp = include('./report_final_results.php');
-  echo $tmp;
+  //$tmp = include('./report_final_results.php');
+  //echo $tmp;
   echo '</classresult>';
+  tcquiz_end_response();
 
 }
 

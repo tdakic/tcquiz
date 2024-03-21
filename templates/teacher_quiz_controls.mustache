@@ -1,0 +1,12 @@
+<div 'id'='teachercontrols' 'class'='que formulation clearfix'>
+  <p> {{#str}} numanswers, quizaccess_tcquiz {{/str}} <span data-region="quizaccess_tcquiz/numberanswers_span" id='numanswers'> 0 </span></p>
+  <p> {{#str}} timeleft, quizaccess_tcquiz {{/str}} <span data-region="quizaccess_tcquiz/timeleft_span" id='timeleft'> 5 </span></p>
+  <p> <button class='btn btn-secondary' data-action="quizaccess_tcquiz/end-question_button">{{#str}} endquestion, quizaccess_tcquiz {{/str}}</button> </p>
+  <p> <button class='btn btn-secondary' data-action="quizaccess_tcquiz/next-question_button">{{#str}} next, quizaccess_tcquiz {{/str}}</button> </p>
+</div>
+
+
+{{#js}}
+require(['quizaccess_tcquiz/teachercontrols'], (module) => module.init('{{sessionid}}', '{{joincode}}','{{quizid}}', '{{cmid}}',
+{{attemptid}}, {{page}}, {{time_for_question}}));
+{{/js}}

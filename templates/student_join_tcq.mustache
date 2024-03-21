@@ -1,0 +1,20 @@
+<form action="" id="studentjointcquizform">
+  <p>
+    <input type="text"
+        id="joincode-{{uniqid}}"
+        name="joincode"
+        data-region="quizaccess_tcquiz/jointcq-input"
+        class="form-control withclear rounded form-inline"
+        style="display:inline";
+        placeholder="{{#str}} entercode, quizaccess_tcquiz{{/str}}";
+        required pattern="[a-zA-Z0-9]";
+        size="25"
+    />
+  </p>
+  <p>   <button class='btn btn-secondary' data-action="quizaccess_tcquiz/starttcq-jointcq_button">{{#str}} jointcquiz, quizaccess_tcquiz {{/str}}</button></p>
+  <p> {{#str}} joininstruct, quizaccess_tcquiz  {{/str}}
+</form>
+
+{{#js}}
+require(['quizaccess_tcquiz/studentjointcq'], (module) => module.init('{{sessionid}}', '{{joincode}}','{{timestamp}}','{{currentpage}}', '{{existingsession}}','{{quizid}}', '{{cmid}}'));
+{{/js}}

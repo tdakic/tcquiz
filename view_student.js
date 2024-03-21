@@ -11,12 +11,14 @@
  * Set up the basic layout of the student view
  **************************************************/
 function tcquiz_init_student_view() {
+  alert("OOOAAAA");
     var msg = "<div id='questionarea'><center><input type='text' id='joincode' required \><br \>";
     //msg = msg+"<center><input type='button' id='rt_join_student' disabled='disabled' onclick='tcquiz_start_attempt();' value='"+tcquiz.text['jointcquiz']+"' />";
     msg = msg+"<input type='button' id='rt_join_student'  onclick='tcquiz_start_attempt();' value='"+tcquiz.text['jointcquiz']+"' />";
     msg += "<p id='status'>"+tcquiz.text['joininstruct']+"</p></center></div>";
     //document.getElementById('questionarea').innerHTML = msg;
     document.getElementById('region-main').innerHTML = msg;
+    alert(msg);
 
     student_try_to_connect();
 }

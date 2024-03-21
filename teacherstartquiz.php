@@ -40,7 +40,6 @@
     (I assume that a student can have at most one open attempt)
 
 */
-//starting attempt for students
 
 use mod_quiz\quiz_attempt;
 use mod_quiz\quiz_settings;
@@ -72,6 +71,9 @@ require_login($quizobj->get_course(), false, $quizobj->get_cm());
 require_sesskey();
 //$PAGE->set_heading($quizobj->get_course()->fullname);
 
+if (!$quizobj->has_capability('mod/quiz:manage')){
+    throw new \moodle_exception('cantstartquiz', 'quiz', $quizobj->view_url());
+}
 // If no questions have been set up yet redirect to edit.php or display an error.
 if (!$quizobj->has_questions()) {
     if ($quizobj->has_capability('mod/quiz:manage')) {
@@ -90,33 +92,24 @@ $context = $quizobj->get_context();
 $quiz = $quizobj->get_quiz();
 
 $tcquiz = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>$joincode]);
-//var_dump($tcquiz);
-//echo "DONE TCQUIZ                                 ";
-
-//student tried to join but either there was no tcquiz with such joincode, or the quiz was not running
-
-  if (!$tcquiz ){
-    echo -2;
-    return;
-  }
-  else if ($tcquiz->status == 0 || $tcquiz->status == 50) {
-    echo -3;
-    return;
-  }
 
 
-$forcenew=false;
+//teacher tried creating a new session,but a session with the same name exists
+if ($tcquiz )
+{
+  echo -1;
+  return;
+}
+
+//will happen automatically for the teacher?
+/*if ($forcenew){
+quiz_delete_previews($quiz, $userid = USER->id) ;
+}*/
+
 // Validate permissions for creating a new attempt and start a new preview attempt if required.
 list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
     quiz_validate_new_attempt($quizobj, $accessmanager, $forcenew, $page, true);
 
-
-//var_dump( $attemptnumber);
-//echo "DONE ATTEMPTNUMBER                                 ";
-
-
-//var_dump($currentattemptid);
-//echo "DONE CURRENTATTEMPTID                                ";
 
 // Check access.
 if (!$quizobj->is_preview_user() && $messages) {
@@ -127,43 +120,29 @@ if (!$quizobj->is_preview_user() && $messages) {
 
 //this should be the case of the teacher rejoining the quiz - the tecaher can have only one preview
 if ($currentattemptid){
-   // need to check if the currentattemptid is in quizaccess_tcquiz_attempt
-    //$tcquiz = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>$joincode]);
-    $tcqattempt = $DB->get_record("quizaccess_tcquiz_attempt", ['attemptid' => $currentattemptid]);
-    //var_dump($tcqattempt);
-    //echo "DONE TCQATTEMPT                                ";
-
-
-
-    if (!$tcqattempt || $tcqattempt-> sessionid != $tcquiz->id){
-      //finish that attempt
-      $unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id);
-      $unfinishedattempt->state = quiz_attempt::FINISHED;
-      //echo "AAAAA ".$tcqattempt-> sessionid." AAAAA ".$tcquiz->id." AAAA  ";
-      //echo "HERE";
-      //var_dump($unfinishedattempt);
-    }
-    else {
-      // found an attempt that has the required joincode and and is a tcqattempt
-      //echo $currentattemptid." ".$tcqattempt-> sessionid;
-      echo $currentattemptid;
-      return;
-    }
-
+  if ($quizobj->is_preview_user()){
+    //this should be the case of the teacher rejoining the quiz - the tecaher can have only one preview
+    echo $currentattemptid;
+    return;
+  }
 }
 
-/*$forcenew=true;
-list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
-    quiz_validate_new_attempt($quizobj, $accessmanager, $forcenew, $page, true);
-    var_dump( $attemptnumber);
-    var_dump($currentattemptid);
+// new attemps are required for teacher or student
 
-*/
-$session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>$joincode]);
+//teacher creates a new record in quizaccess_tcquiz_session
+
+  $session = new stdClass();
+  $session->timestamp = time();
+  $session->joincode = $joincode;
+  $session->quizid = $quiz->id;
+
+  $session->status = 10; // TCQUIZ_STATUS_READYTOSTART = 10 in locallib.php;
+  $session->currentquestion = 0;
+  $session->currentpage = -1;
+  $session->currentquestionstate = 1;
+  $session->id = $DB->insert_record('quizaccess_tcquiz_session', $session);
 
 
-//var_dump( $attemptnumber);
-//echo "ATTEMPT NUMBER DUMPED    ";
 
 $attempt = quiz_prepare_and_start_new_attempt($quizobj, $attemptnumber, $lastattempt);
 

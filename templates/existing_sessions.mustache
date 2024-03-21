@@ -1,0 +1,20 @@
+<table class="table table-striped" id="output">
+    <thead>
+        <th> One </th>
+        <th> Two </th>
+        <th> Three </th>
+    </thead>
+    <tbody>
+        {{#opensess}}
+            <tr>
+
+                <td>
+                    JJJJ {{joincode}}
+
+                </td>
+                <td>{{timestamp}}</td>
+                <td>{{{currentquestion}}}</td>
+            </tr>
+        {{/opensess}}
+    </tbody>
+</table>

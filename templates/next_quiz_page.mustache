@@ -1,0 +1,9 @@
+<div 'id'='teachercontrols' 'class'='que formulation clearfix'>
+  <p> <button class='btn btn-secondary' data-action="quizaccess_tcquiz/next-question_in_review_button">{{#str}} next, quizaccess_tcquiz {{/str}}</button> </p>
+</div>
+
+
+{{#js}}
+require(['quizaccess_tcquiz/nextquizpage'], (module) => module.init('{{sessionid}}', '{{joincode}}','{{quizid}}', '{{cmid}}',
+{{attemptid}}, {{page}}));
+{{/js}}

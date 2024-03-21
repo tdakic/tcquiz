@@ -179,72 +179,35 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
         global $USER;
         global $CFG;
         global $DB;
-
+        global $OUTPUT;
 
         $quizobj = quiz_settings::create_for_cmid($this->quiz->cmid, $USER->id);
         $context = $quizobj->get_context();
 
         if (!$quizobj->has_questions()){
           $messages[] ='This quiz is configured as a TCQuiz';
-          return $messages;
-        }
-
-        $messages[] = '<div id="questionarea" class="generalbox boxwidthwide boxaligncenter tcquizbox"></div>';
-        $messages[] = '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/quiz/accessrule/tcquiz/locallib.js"></script>';
-        $messages[] = "<script type='text/javascript'>
-
-        window.addEventListener('load', function(){
-
-        tcquiz_set_quizid(".$this->quiz->id.");
-        tcquiz_set_userid(".$USER->id.");
-        tcquiz_set_sesskey('".sesskey()."');
-        tcquiz_set_siteroot('".$CFG->wwwroot."');
-        tcquiz_set_cmid(".$this->quiz->cmid.");
-
-        tcquiz_set_text('joinquizasstudent','".addslashes(get_string('joinquizasstudent','quizaccess_tcquiz'))."');
-        tcquiz_set_text('next', '".addslashes(get_string('next', 'quizaccess_tcquiz'))."');
-        tcquiz_set_text('startquiz', '".addslashes(get_string('startquiz', 'quizaccess_tcquiz'))."');
-        tcquiz_set_text('startnewquiz', '".addslashes(get_string('startnewquiz', 'quizaccess_tcquiz'))."');
-        tcquiz_set_text('startnewquizconfirm', '".addslashes(get_string('startnewquizconfirm','quizaccess_tcquiz'))."');
-        tcquiz_set_text('studentconnected', '".addslashes(get_string('studentconnected','quizaccess_tcquiz'))."');
-        tcquiz_set_text('studentsconnected', '".addslashes(get_string('studentsconnected','quizaccess_tcquiz'))."');
-        tcquiz_set_text('teacherstartinstruct', '".addslashes(get_string('teacherstartinstruct','quizaccess_tcquiz'))."');
-        tcquiz_set_text('teacherstartnewinstruct', '".addslashes(get_string('teacherstartnewinstruct','quizaccess_tcquiz'))."');
-        tcquiz_set_text('teacherjoinquizinstruct', '".addslashes(get_string('teacherjoinquizinstruct','quizaccess_tcquiz'))."');
-        tcquiz_set_text('reconnectquiz', '".addslashes(get_string('reconnectquiz','quizaccess_tcquiz'))."');
-        tcquiz_set_text('reconnectinstruct', '".addslashes(get_string('reconnectinstruct','quizaccess_tcquiz'))."');
-        tcquiz_set_text('waitstudent', '".addslashes(get_string('waitstudent','quizaccess_tcquiz'))."');
-        tcquiz_set_text('clicknext', '".addslashes(get_string('clicknext','quizaccess_tcquiz'))."');
-        tcquiz_set_text('question', '".addslashes(get_string('question','quizaccess_tcquiz'))."');
-        tcquiz_set_text('timeleft', '".addslashes(get_string('timeleft','quizaccess_tcquiz'))."');
-
-        tcquiz_set_text('joininstruct', '".addslashes(get_string('joininstruct','quizaccess_tcquiz'))."');
-        tcquiz_set_text('jointcquiz', '".addslashes(get_string('jointcquiz','quizaccess_tcquiz'))."');
-        tcquiz_set_text('waitfirst', '".addslashes(get_string('waitfirst','quizaccess_tcquiz'))."');
-        tcquiz_set_text('questionfinished', '".addslashes(get_string('questionfinished','quizaccess_tcquiz'))."');
-        tcquiz_set_text('availablesessionsdesc', '".addslashes(get_string('availablesessionsdesc','quizaccess_tcquiz'))."');
-
-        tcquiz_set_text('finalresults', '".addslashes(get_string('finalresults','quizaccess_tcquiz'))."');
-
-        });
-        </script>";
-
-        if (has_capability('mod/quiz:preview', $context)){
-
-          $messages[] = '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/quiz/accessrule/tcquiz/view_teacher.js"></script>';
-          $messages[] = '<script type="text/javascript">  window.addEventListener("load", function() { tcquiz_init_teacher_view('.json_encode(self::get_open_sessions($context)).'); }, false);
-        </script>';
-
         }
         else {
-          $messages[] = '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/quiz/accessrule/tcquiz/view_student.js"></script>';
-          $messages[] = '<script type="text/javascript">window.addEventListener("load", function() { tcquiz_init_student_view(); }); </script>';
+            if (has_capability('mod/quiz:preview', $context)){
 
-        }
-
-        $messages[] = "</div>";
-
-        return $messages;
+              if (!$data = self::get_open_session($context)){
+                $existing_session = false;
+              }
+              else {
+                $existing_session = true;
+              }
+              $messages[] = $OUTPUT->render_from_template('quizaccess_tcquiz/start_tcq', ['sessionid'=>$data['sessionid'], 'joincode'=>$data['joincode'],
+                'timestamp'=>$data['timestamp'],'currentpage'=>$data['currentpage'], 'status'=> $data['status'], 'attemptid'=>$data['attemptid'],
+                'existingsession'=>$existing_session,'quizid'=>$this->quiz->id, 'cmid'=>$this->quiz->cmid]);
+            }
+            else {
+              $existing_session = false; // get rid of this
+              $messages[] = $OUTPUT->render_from_template('quizaccess_tcquiz/student_join_tcq', ['sessionid'=>$data['sessionid'], 'joincode'=>$data['joincode'],
+                'timestamp'=>$data['timestamp'],'currentpage'=>$data['currentpage'], 'existingsession'=>$existing_session,
+                'quizid'=>$this->quiz->id, 'cmid'=>$this->quiz->cmid]);
+            }
+      }
+      return $messages;
     }
 
  private function get_open_sessions($context)  : array {
@@ -288,4 +251,35 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
     }
     return $messages;
   }
+
+  private function get_open_session($context)  : array {
+     global $DB;
+     global $USER;
+
+        // check to see if an open attempt of the teacher is a tcquiz attempt
+        $sql = "SELECT * FROM {quizaccess_tcquiz_attempt} qta
+                        LEFT JOIN {quiz_attempts} qa ON qta.attemptid = qa.id
+                        WHERE qa.state = 'inprogress' AND qa.quiz = :quizid AND qa.userid = :uid";
+
+        //$sess = $DB->get_record_sql($sql, ['quizid' => $this->quiz->id]);
+
+        if (!$attempt = $DB->get_record_sql($sql, ['quizid' => $this->quiz->id, 'uid' => $USER->id])){
+          return [];
+        }
+        else{
+          //get the session assocaited with the teacher's attempt and return its data
+          //Should be vetween 10 and 40 !!!!!!!!!!
+          $sql = "SELECT * FROM {quizaccess_tcquiz_session} WHERE id = :sessid AND status BETWEEN 10 and 40";
+          if (!$sess = $DB->get_record_sql($sql, ['sessid' => $attempt ->sessionid])){
+            return [];
+          }
+          else {
+            return array('sessionid'=>$sess->id, 'joincode'=>$sess->joincode, 'timestamp'=>date('m/d/Y H:i:s',$sess->timestamp), 'currentpage'=>$sess->currentpage,
+              'status'=>$sess->status,  'attemptid'=>$attempt->id);
+          }
+        }
+
+
+   }
+
 }

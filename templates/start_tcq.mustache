@@ -1,0 +1,50 @@
+<div id="starttcquizform">
+
+  <h2> {{#str}} startnewquiz, quizaccess_tcquiz {{/str}} </h2>
+  <p> {{#str}}  teacherstartnewinstruct, quizaccess_tcquiz {{/str}} </p>
+  <p> {{#str}} teacherwarning, quizaccess_tcquiz {{/str}} </p>
+  <form action="">
+  <button type="submit" class='btn btn-secondary' data-action="quizaccess_tcquiz/starttcq-startnew_button">{{#str}} startnewquiz, quizaccess_tcquiz {{/str}}</button>
+
+    <input type="text"
+        id="joincode-{{uniqid}}"
+        name="joincode"
+        data-region="quizaccess_tcquiz/starttcq-input"
+        class="form-control withclear rounded form-inline"
+        style="display:inline";
+        placeholder="{{#str}}enterjoincode, quizaccess_tcquiz{{/str}}";
+        required pattern="[a-zA-Z0-9]";
+        size="15"
+    />
+    <div class="form-control-feedback invalid-feedback" id="id_error_name" tabindex="0">
+     - You must supply a value here.</div>
+  <br /><br />
+</form>
+
+  {{#existingsession}}
+    <h2> {{#str}}  availablesession, quizaccess_tcquiz {{/str}} </h2>
+    <p> {{#str}} availablesessionsdesc, quizaccess_tcquiz {{/str}} </p>
+    <table class="table table-striped" id="output">
+        <thead>
+            <th> {{#str}} joincode, quizaccess_tcquiz {{/str}} </th>
+            <th> {{#str}} timestarted, quizaccess_tcquiz {{/str}} </th>
+            <th> {{#str}} currentpage, quizaccess_tcquiz {{/str}} </th>
+        </thead>
+        <tbody>
+                <tr>
+                    <td>{{{joincode}}}</td>
+                    <td>{{{timestamp}}}</td>
+                    <td>{{{currentpage}}}</td>
+                    <td> <button class="btn btn-secondary" name="{{sessionid}}" data-action="quizaccess_tcquiz/starttcq-rejoin_button">{{#str}} rejoin, quizaccess_tcquiz {{/str}}</button></td>
+                    <td> <button class="btn btn-secondary" name="{{sessionid}}" data-action="quizaccess_tcquiz/starttcq-end_button">{{#str}} end, quizaccess_tcquiz {{/str}}</button></td>
+                </tr>
+
+        </tbody>
+    </table>
+  {{/existingsession}}
+</div>
+
+
+{{#js}}
+require(['quizaccess_tcquiz/starttcq'], (module) => module.init('{{sessionid}}', '{{joincode}}','{{timestamp}}','{{currentpage}}', '{{status}}','{{attemptid}}','{{existingsession}}','{{quizid}}', '{{cmid}}'));
+{{/js}}

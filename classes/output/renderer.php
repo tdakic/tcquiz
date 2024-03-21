@@ -213,7 +213,7 @@ public function tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $id, $
   public function tcq_review_page(quiz_attempt $attemptobj, $slots, $page, $showall,
           $lastpage, display_options $displayoptions, $summarydata , $sessionid, $sesskey) {
 
-      global $CFG;
+      global $CFG, $OUTPUT;
 
       $output = '';
       $output .= $this->header();
@@ -231,12 +231,13 @@ public function tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $id, $
         $output .= $this->tcq_review_form($page, $showall, $displayoptions,
                 $this->questions($attemptobj, true, $slots, $page, $showall, $displayoptions),
                 $attemptobj);
+                //$output .= $this->review_next_navigation($attemptobj, $page, $lastpage, $showall);
+                $output .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/quiz/accessrule/tcquiz/locallib.js"></script>';
+                $output .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/quiz/accessrule/tcquiz/view_student.js"></script>';
+                $output .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/quiz/accessrule/tcquiz/view_teacher.js"></script>';
+                $output .= $this->tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $attemptobj->get_quizid(), $sessionid, $sesskey);
       }
-      //$output .= $this->review_next_navigation($attemptobj, $page, $lastpage, $showall);
-      $output .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/quiz/accessrule/tcquiz/locallib.js"></script>';
-      $output .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/quiz/accessrule/tcquiz/view_student.js"></script>';
-      $output .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/mod/quiz/accessrule/tcquiz/view_teacher.js"></script>';
-      $output .= $this->tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $attemptobj->get_quizid(), $sessionid, $sesskey);
+
 
 
 
@@ -252,7 +253,11 @@ public function tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $id, $
           //localib js loaded twice?
           $output .= $this->tcq_teacher_controls_and_js();
         }*/
-        $output .=  $this->tcq_teacher_controls_and_js();
+        //$output .=  $this->tcq_teacher_controls_and_js();
+        $output .= $OUTPUT->render_from_template('quizaccess_tcquiz/next_quiz_page', ['sessionid'=>$sessionid, 'joincode'=>"xxx",
+          'quizid'=>$attemptobj->get_quizid(), 'cmid'=> $attemptobj->get_cmid(), 'attemptid'=>$attemptobj->get_attemptid(),'page'=>$page, 'time_for_question' => 60]);
+
+
       }
       else{
         $output .= '<script type="text/javascript"> window.addEventListener("load", function(){ tcquiz_get_student_question();}); </script>';
@@ -279,9 +284,8 @@ public function tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $id, $
           return $content;
       }
 
-
-      //$this->page->requires->js_init_call('M.mod_quiz.init_review_form', null, false,
-      //        quiz_get_js_module());
+      $this->page->requires->js_init_call('M.mod_quiz.init_review_form', null, false,
+              quiz_get_js_module());
 
       $output = '';
       $output .= html_writer::start_tag('form', ['action' => $attemptobj->review_url(null,
@@ -305,7 +309,7 @@ public function tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $id, $
       global $CFG;
 
 
-    //  $this->page->requires->js_init_call('M.mod_quiz.init_review_form', null, false,
+    //  $this->page->requires->js_call('M.mod_quiz.init_review_form', null, false,
       //        quiz_get_js_module());
 
 
@@ -412,12 +416,12 @@ public function tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $id, $
 
     public function tcq_teacher_attempt_page($attemptobj, $page, $accessmanager, $messages, $slots, $id, $sessionid, $sesskey, $time_left_for_question) {
 
-      global $CFG;
+      global $CFG, $OUTPUT;
       $output = '';
       $output .= $this->header();
 
 
-      $process_url = new moodle_url(new moodle_url('/mod/quiz/accessrule/tcquiz/processattempt.php'),['cmid' => $attemptobj->get_cmid(),'attemptid'=>$attemptobj->get_attemptid(),'sessionid'=>$sessionid]);
+      $process_url = new moodle_url(new moodle_url('/mod/quiz/accessrule/tcquiz/processattempt.php'),['thispage'=>$page, 'sesskey' => $sesskey,'cmid' => $attemptobj->get_cmid(),'attempt'=>$attemptobj->get_attemptid(),'sessionid'=>$sessionid]);
 
       $output .= html_writer::start_tag('form',
                                       ['action' => $process_url,
@@ -469,10 +473,13 @@ public function tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $id, $
       $output .= html_writer::start_tag('p',['id' => 'status']);
       $output .= html_writer::end_tag('p');
 
-      $output .= $this->tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $id, $sessionid, $sesskey);
-      $output .= $this->tcq_teacher_controls_and_js();
+      //$output .= $this->tcq_transfer_parameters_to_js($attemptobj, $page, $slots, $id, $sessionid, $sesskey);
+      //$output .= $this->tcq_teacher_controls_and_js();
 
-      $output .= '<script type="text/javascript">window.addEventListener("load", function(){ tcquiz_start_timer('.$time_left_for_question.', false);}); </script>';
+      $output .= $OUTPUT->render_from_template('quizaccess_tcquiz/teacher_quiz_controls', ['sessionid'=>$sessionid, 'joincode'=>"xxx",
+        'quizid'=>$attemptobj->get_quizid(), 'cmid'=> $attemptobj->get_cmid(), 'attemptid'=>$attemptobj->get_attemptid(),'page'=>$page, 'time_for_question' => $time_left_for_question]);
+
+      //$output .= '<script type="text/javascript">window.addEventListener("load", function(){ tcquiz_start_timer('.$time_left_for_question.', false);}); </script>';
 
       $output .= $this->connection_warning();
 

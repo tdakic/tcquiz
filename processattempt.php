@@ -89,6 +89,8 @@ if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sess
   throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
+var_dump($session);
+
 //if the state of the quiz is different than TCQUIZ_STATUS_SHOWQUESTION =  20 or TCQUIZ_STATUS_PREVIEWQUESTION = 15 defined in locallib.php
 if ($session->status != 15  && $session->status != 20){
   throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
@@ -166,7 +168,7 @@ else {
   $DB->update_record('quizaccess_tcquiz_session', $session);
 
   sleep(1); // alows everyone to submit
-  $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',['page' => $page, 'sesskey' => sesskey(),'showall' => false, 'attempt' => $attemptid, 'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]));
+  $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',['page' => $page, 'sesskey' => sesskey(),'showall' => 0, 'attempt' => $attemptid, 'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]));
   header("Location: ". $url);
   exit;
 }

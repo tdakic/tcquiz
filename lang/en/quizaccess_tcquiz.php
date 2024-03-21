@@ -33,26 +33,52 @@ $string['yes'] = 'Yes';
 $string['no'] = 'No';
 
 //teacher startpage
+$string['availablesession'] = 'Available session';
+$string['availablesessionsdesc'] = 'Click on <b> Rejoin </b> to reconnect to an already running session. This is primarily meant for reconnecting if your session crashed during the quiz administration. If you click on <b> End </b>, this will end the session and finish all the student attempts associated with it';
+$string['teacherstartnewinstruct'] = 'Click on the <b> Start new quiz session </b> button to start a new quiz sesion. You must provide a code for the session that the students can use to connect.';
+$string['teacherwarning']= 'If there is an <b> Available session </b> visible below, starting a new session will close that session. Be very careful, as this will close any open student attempts associated with this quiz. If in doubt and if available below, try reconnecting to the existing session.';
+$string['cantstartquiz'] ='You cannot start this quiz';
+$string['startnewquiz'] = 'Start new quiz session';
+$string['joincode'] = 'Join code';
+$string['timestarted'] = 'Time started';
+$string['currentpage'] = 'Current page';
+$string['rejoin'] = 'Rejoin';
+$string['end'] = 'End';
+$string['enterjoincode'] = 'Enter join code';
+
+//wait_for_students page
+$string['waitstudent'] = 'Waiting for students to connect';
+$string['next'] = 'Next >>';
+$string['numconnectedstudents'] = 'Number of connected students';
+$string['clicknext'] = 'Click \'Next\' when everyone is ready';
+$string['waitfirst'] = 'Waiting for the first question to be sent';
+
+//teacher controls
+$string['numanswers'] = 'Number of received answers';
+$string['timeleft'] = 'Time left to answer:';
+$string['endquestion'] = 'End question';
+
+//student responseformsubmit
+$string['jointcquiz'] = 'Join quiz';
+$string['entercode'] = 'Enter code given by teacher';
+$string['joininstruct'] = 'Wait until your teacher tells you before you click on this';
+
 $string['teacherjoinquizinstruct'] = 'Use this if you want to try out a quiz yourself<br />(you will also need to start/reconnect to the quiz in a separate window).';
 $string['teacherstartinstruct'] = 'Use this to start a quiz for the students to take<br />Use the textbox to define a name for this session (to help when looking through the results at a later date).';
-$string['teacherstartnewinstruct'] = 'Start a new quiz session. If there is a <b> Join </b> button visible above, this will close the session that is already running. Be very careful, as this will close any open student attempts associated with this quiz. If in doubt, if available above, try reconnecting to the existing session.';
-$string['availablesessionsdesc'] = 'If there is an available session listed above, you can try clicking on <b> Rejoin </b> to reconnect to it. This is primarily meant for reconnecting if your session crashed during the quiz administration. If you click on <b> End </b>, this will end the session and finish all the student attempts associated with it';
 $string['startquiz'] = 'Start quiz';
-$string['startnewquiz'] = 'Start new quiz session';
-$string['startnewquizconfirm'] = 'Are you absolutely sure you want to abandon the currently running quiz session and start a new one?';
 $string['studentconnected'] = 'student connected';
-$string['studentsconnected'] = 'students connected';
-$string['clicknext'] = 'Click \'Next\' when everyone is ready';
-$string['next'] = 'Next >>';
+//$string['studentsconnected'] = 'students connected';
+$string['startnewquizconfirm'] = 'Are you absolutely sure you want to abandon the currently running quiz session and start a new one?';
+
+
 $string['reconnectquiz'] = 'Reconnect to quiz';
 $string['reconnectinstruct'] = 'The quiz is already running - you can connect to this session and take control of it.';
-$string['waitstudent'] = 'Waiting for students to connect';
 $string['jointcquiz'] = 'Join quiz';
 $string['joinquizasstudent'] = 'Join quiz as a student';
 
 
 $string['question'] = 'Question ';
-$string['timeleft'] = 'Time left to answer:';
+
 
 $string['finalresults'] = 'Final results';
 
@@ -106,7 +132,7 @@ $string['httperror'] = 'There was a problem with the request - status: ';
 $string['httprequestfail'] = 'Giving up :( Cannot create an XMLHTTP instance';
 $string['incorrectstatus'] = 'Quiz has incorrect status: \'';
 $string['invalidanswer'] = 'Invalid answer number ';
-$string['joininstruct'] = 'Wait until your teacher tells you before you click on this';
+
 
 $string['modulename'] = 'TCQuiz';
 $string['modulenameplural'] = 'TCQuizzes';
@@ -169,7 +195,7 @@ $string['tryagain'] = 'Do you want to try again?';
 $string['unknownrequest'] = 'Unknown request: \'';
 $string['updatequestion'] = 'Save question';
 $string['view'] = 'View quiz';
-$string['waitfirst'] = 'Waiting for the first question to be sent';
+
 
 $string['yourresult'] = 'Your result: ';
 

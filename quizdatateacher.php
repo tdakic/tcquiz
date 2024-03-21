@@ -43,21 +43,24 @@ $requesttype = required_param('requesttype', PARAM_ALPHA);
 $quizid = required_param('quizid', PARAM_INT);
 $attempt = optional_param('attempt', -1, PARAM_INT );
 $joincode = required_param('joincode', PARAM_ALPHA);
-$cmid = optional_param('cmid', 24, PARAM_INT);
+$cmid = optional_param('cmid', -1, PARAM_INT);
+$sessionid = optional_param('sessionid', -1, PARAM_INT);
 //there is also PARAM_TEXT
 /***********************************************************
  * start of main code
  ***********************************************************/
 
-tcquiz_start_response();
+
 
 if (!$quiz = $DB->get_record("quiz", array('id' => $quizid))) {
-    tcquiz_send_error("Quiz ID incorrectt");
+    tcquiz_start_response();
+    tcquiz_send_error("Quiz ID incorrectt ".$quizid ."!!!!!");
     tcquiz_end_response();
     die();
 }
 
 if (!$tcquiz = $DB->get_record("quizaccess_tcquiz", array('quizid' => $quizid))){
+  tcquiz_start_response();
   echo "<quizid>".$quizid."</quizid>";
   tcquiz_send_error("TCQuiz ID incorrectt");
   tcquiz_end_response();
@@ -65,7 +68,8 @@ if (!$tcquiz = $DB->get_record("quizaccess_tcquiz", array('quizid' => $quizid)))
 
 }
 
-if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('quizid' => $quizid,'joincode' => $joincode))){
+if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('quizid' => $quizid,'id' => $sessionid))){
+  tcquiz_start_response();
   echo "<code>".$joincode."</code>";
   echo "<quizid>".$quizid."</quizid>";
 
@@ -75,11 +79,13 @@ if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('quizid' => $
 }
 
 if (!$course = $DB->get_record("course", array('id' => $quiz->course))) {
+    tcquiz_start_response();
     tcquiz_send_error("Course is misconfigured");
     tcquiz_end_response();
     die();
 }
 if (!$cm = get_coursemodule_from_instance("quiz", $quiz->id, $course->id)) {
+    tcquiz_start_response();
     tcquiz_send_error("Course Module ID was incorrect");
     tcquiz_end_response();
     die();
@@ -92,6 +98,7 @@ if ($CFG->version < 2011120100) {
 $PAGE->set_context($context);
 
 if (!has_capability('mod/quiz:preview', $context)) {
+    tcquiz_start_response();
     tcquiz_send_error(get_string('notallowedattempt', 'tcquiz'));
     tcquiz_end_response();
     die();
@@ -122,7 +129,7 @@ if ($requesttype == 'startquiz') {
 } else if ($requesttype == 'getquestion'){
 
       $rejoin = required_param('rejoin', PARAM_BOOL);
-      $tcqsid = required_param('tcqsid', PARAM_INT);
+      //$tcqsid = required_param('tcqsid', PARAM_INT);
 
       $page_slot =  $session->currentpage;
 
@@ -132,7 +139,9 @@ if ($requesttype == 'startquiz') {
       {
         $session->status = TCQUIZ_STATUS_FINALRESULTS;
         $DB->update_record('quizaccess_tcquiz_session', $session); // FIXME - not update all fields?
-        tcquiz_get_final_results($session);
+        tcquiz_start_response();
+        tcquiz_get_final_results($session->id,$cmid,$quizid);
+        tcquiz_end_response();
         return;
       }
 
@@ -149,10 +158,19 @@ if ($requesttype == 'startquiz') {
       }
 
 
-      echo '<status>showquestion</status>';
+      //echo '<status>showquestion</status>';
+      tcquiz_start_response();
       echo '<url>';
-      echo htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php',['page' => $session->currentpage, 'showall' => false, 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $session->id ]));
+      $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php',['page' => $session->currentpage, 'showall' => 0, 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $session->id, 'sesskey' => $USER->sesskey ]));
+      //header("Location: ". $url, true, 301);
+      echo $url;
       echo '</url>';
+      tcquiz_end_response();
+      //return;
+      //exit();
+      //echo "DOne";
+
+      //
 }
 
 else if ($requesttype == 'getresults') {
@@ -163,35 +181,44 @@ else if ($requesttype == 'getresults') {
 
       sleep(2); // alows everyone to submit
 
+      tcquiz_start_response();
       echo '<status>showresults</status>';
       echo '<url>';
       echo htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',['page' => $session->currentpage, 'showall' => 'false', 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $session->id ]));
       echo '</url>';
+      tcquiz_end_response();
 
 }
 
 else if ($requesttype == 'getnumberstudents') {
+    tcquiz_start_response();
     echo '<status>updatenumberstudents</status>';
     tcquiz_number_students($quizid);
+    tcquiz_end_response();
 }
 
 else if ($requesttype == 'getnumberanswers') {
+    tcquiz_start_response();
     echo '<status>updatenumberanswers</status>';
     tcquiz_get_number_of_answers($session->id, $session->currentquestion);
+    tcquiz_end_response();
 }
 
 else if ($requesttype == 'getfinalresults'){
+    tcquiz_start_response();
     $tcqsid = required_param('tcqsid', PARAM_INT);
     $session->status = TCQUIZ_STATUS_FINALRESULTS;
     $DB->update_record('quizaccess_tcquiz_session', $session); // FIXME - not update all fields?
     tcquiz_get_final_results($session);
+    tcquiz_end_response();
+
 }
 
 else if ($requesttype == 'endquiz'){
+    tcquiz_start_response();
     $tcqsid = required_param('tcqsid', PARAM_INT);
     $session->status = TCQUIZ_STATUS_FINISHED;
     $session->currentpage = $session->currentpage + 1; //for preventing going back?
     $DB->update_record('quizaccess_tcquiz_session', $session); // FIXME - not update all fields?
+    tcquiz_end_response();
 }
-
-tcquiz_end_response();

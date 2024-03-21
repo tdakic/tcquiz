@@ -11,6 +11,7 @@ global $DB;
 
 $sessionid = required_param('id', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
+
 $quizobj = quiz_settings::create_for_cmid($cmid, $USER->id);
 
 if ($quizobj->is_preview_user()){
