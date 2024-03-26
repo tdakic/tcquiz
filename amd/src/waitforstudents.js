@@ -15,7 +15,7 @@ const registerEventListeners = (sessionid, joincode, quizid, cmid, attemptid) =>
 
   document.addEventListener('click', async (e) => {
         if (e.target.closest(Selectors.actions.nextButton)) {
-
+          e.preventDefault();
           clearInterval(updateNumStudentsEvent);
           updateNumStudentsEvent = null;
 

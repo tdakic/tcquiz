@@ -48,7 +48,7 @@ if ($id = optional_param('id', 0, PARAM_INT)) {
 // Get submitted parameters.
 $attemptid = required_param('attempt', PARAM_INT);
 $page = required_param('page', PARAM_INT);
-$cmid = optional_param('cmid', 24, PARAM_INT);
+$cmid = optional_param('cmid', -1, PARAM_INT);
 $quizid = required_param('quizid', PARAM_INT);
 $sessionid = required_param('sessionid', PARAM_INT);
 

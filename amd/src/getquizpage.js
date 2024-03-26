@@ -1,15 +1,9 @@
 
+const registerEventListeners = (sessionid, joincode, quizid, cmid, attemptid, page, time_for_question) => {
+// should this listener be more specific or should
 
-const registerEventListeners = (sessionid, joincode, quizid, cmid, attemptid) => {
-
-  window.goToCurrentQuizPageEvent = setInterval(async () =>
-    {await go_to_current_quiz_page(sessionid, joincode, quizid, cmid, attemptid);}, 250);
-
-};
-
-
-export const init = (sessionid, joincode, quizid, cmid, attemptid) => {
-  registerEventListeners(sessionid, joincode, quizid, cmid, attemptid);
+window.goToCurrentQuizPageEvent = setInterval(async () =>
+  {await go_to_current_quiz_page(sessionid, joincode, quizid, cmid, attemptid, page, time_for_question);}, 250);
 };
 
 
@@ -20,13 +14,15 @@ export const init = (sessionid, joincode, quizid, cmid, attemptid) => {
  * @param {quizid} quizid The second number.
  * @param {cmid} cmid The second number.
  * @param {attemptid} attemptid The second number.
+ * @param {page} page The second number.
+ * @param {time_for_question} time_for_question The second number.
  * @returns {quizid} The sum of the two numbers.
  */
-async function go_to_current_quiz_page(sessionid, joincode, quizid, cmid, attemptid) {
+async function go_to_current_quiz_page(sessionid, joincode, quizid, cmid, attemptid, page, time_for_question) {
 
   var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatastudent.php?requesttype=getnumberstudents&quizid='
     +quizid+'&joincode='+joincode+'&sessionid='+sessionid+'&cmid='+ cmid +'&attempt='+attemptid
-    +'&currentquestion=0&sesskey='+ M.cfg.sesskey,{method: 'POST'});
+    +'&currentquestion=0&sesskey='+ M.cfg.sesskey+'&page='+page+'time_for_q='+time_for_question,{method: 'POST'});
 
   var response_xml_text = await result.text();
 
@@ -77,10 +73,10 @@ function update_quiz_page(response_xml_text) {
 
               } else if (quizstatus == 'showresults') {
 
-                window.goToCurrentQuizPageEvent = null;
-                clearInterval(window.goToCurrentQuizPageEvent);
-                var result_url = quizresponse.getElementsByTagName('url').item(0).textContent;
-                window.location.replace(result_url);
+                //window.goToCurrentQuizPageEvent = null;
+                //clearInterval(window.goToCurrentQuizPageEvent);
+                //var result_url = quizresponse.getElementsByTagName('url').item(0).textContent;
+                //window.location.replace(result_url);
 
                   //tcquiz_delayed_request("tcquiz_get_student_question()",900); // Wait for next question to be displayed
               }
@@ -96,11 +92,13 @@ function update_quiz_page(response_xml_text) {
 
                   window.goToCurrentQuizPageEvent = null;
                   clearInterval(window.goToCurrentQuizPageEvent);
+                  var result_url = quizresponse.getElementsByTagName('url').item(0).textContent;
+                  window.location.replace(result_url);
 
 
               } else if (quizstatus == 'error') {
                   var errmsg = quizresponse.getElementsByTagName('message').item(0).textContent;
-                  alert(errmsg);
+                  alert('ERR' + errmsg);
 
               } else if (quizstatus == 'noaction') {
 
@@ -112,5 +110,10 @@ function update_quiz_page(response_xml_text) {
               }
           }
 
-
 }
+
+
+export const init = (sessionid, joincode, quizid, cmid, attemptid, page, time_for_question) => {
+  //alert(sessionid, joincode, quizid, cmid, attemptid, page, time_for_question);
+  registerEventListeners(sessionid, joincode, quizid, cmid, attemptid, page, time_for_question);
+};

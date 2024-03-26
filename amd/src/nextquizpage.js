@@ -9,7 +9,7 @@ const Selectors = {
 const registerEventListeners = (sessionid, joincode, quizid, cmid, attemptid, page) => {
   document.addEventListener('click', async(e) => {
         if (e.target.closest(Selectors.actions.nextquestionButtonR)) {
-
+          e.preventDefault();
           page++;
 
           var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getquestion&quizid='

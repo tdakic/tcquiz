@@ -1,0 +1,9 @@
+<div >
+  <p> {{#str}} timeleft, quizaccess_tcquiz {{/str}} <span data-region="quizaccess_tcquiz/timeleft_span" id='timeleft'> 5 </span></p>
+</div>
+
+
+{{#js}}
+require(['quizaccess_tcquiz/studenttimer'], (module) => module.init('{{sessionid}}', '{{joincode}}','{{quizid}}', '{{cmid}}',
+{{attemptid}}, {{page}}, {{time_for_question}}));
+{{/js}}

@@ -209,6 +209,7 @@ else if ($requesttype == 'getfinalresults'){
     $tcqsid = required_param('tcqsid', PARAM_INT);
     $session->status = TCQUIZ_STATUS_FINALRESULTS;
     $DB->update_record('quizaccess_tcquiz_session', $session); // FIXME - not update all fields?
+    //sleep(1);
     tcquiz_get_final_results($session);
     tcquiz_end_response();
 

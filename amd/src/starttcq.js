@@ -49,6 +49,7 @@ const registerEventListeners = (sessionid, joincode, timestamp, currentpage, sta
 
     document.addEventListener('click', async(e) => {
           if (e.target.closest(Selectors.actions.endButton)) {
+            e.preventDefault();
 
             var url = M.cfg.wwwroot+"/mod/quiz/accessrule/tcquiz/end_session.php?id="+ e.target.name + "&cmid=" + cmid;
 
@@ -64,6 +65,7 @@ const registerEventListeners = (sessionid, joincode, timestamp, currentpage, sta
 
     document.addEventListener('click', async(e) => {
           if (e.target.closest(Selectors.actions.rejoinButton)) {
+            e.preventDefault();
             //constants defined in locallib.php. Move them!!!
             var url = "";
             if (status == 10){

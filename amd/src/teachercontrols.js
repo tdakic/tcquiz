@@ -13,7 +13,7 @@ const registerEventListeners = (sessionid, joincode, quizid, cmid, attemptid, pa
 
   document.addEventListener('click', async(e) => {
         if (e.target.closest(Selectors.actions.nextquestionButton)) {
-
+          e.preventDefault();
           page++;
           clearInterval(updateNumAnswersEvent);
           updateNumAnswersEvent = null;
@@ -58,6 +58,8 @@ const registerEventListeners = (sessionid, joincode, quizid, cmid, attemptid, pa
         if (timeLeft <= 0) {
           clearInterval(timer);
           timer = null;
+          clearInterval(updateNumAnswersEvent);
+          updateNumAnswersEvent = null;
           timeLeft_html.innerHTML = 0;
           document.getElementById('responseform').submit();
         }

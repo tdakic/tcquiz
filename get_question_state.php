@@ -14,4 +14,5 @@ $session = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid
 }*/
 //$quizid = $session -> quizid;
 
+header('content-type: text/xml');
 echo $session->currentquestionstate;

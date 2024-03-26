@@ -38,7 +38,8 @@ $requesttype = required_param('requesttype', PARAM_ALPHA);
 $quizid = required_param('quizid', PARAM_INT);
 $attempt = optional_param('attempt', -1, PARAM_INT );
 $joincode = optional_param('joincode', '', PARAM_ALPHA);
-
+$cmid = optional_param('cmid', -1, PARAM_INT);
+$sessionid = optional_param('sessionid', -1, PARAM_INT);
 
 /***********************************************************
  * start of main code
@@ -51,7 +52,7 @@ tcquiz_start_response();
 if ($requesttype == "getresults" || $requesttype == "finalresults"){
    //echo "<sleep> 1 </sleep>";
   //submits happen from js, so wait a bit
-   sleep(1);
+   //sleep(1);
 
 }
 //just for testing
@@ -90,7 +91,8 @@ if (!has_capability('mod/quiz:attempt', $context)) {
 //$tcqid = $DB->execute("SELECT id FROM quizaccess_tcquiz_session ORDER BY timestamp DESC LIMIT 1",array('quizid' => $quizid));
 //$tcqid = $DB->execute("SELECT id FROM quizaccess_tcquiz_session ORDER BY timestamp DESC LIMIT 1",array('quizid' => $quizid));
 //$tcquiz = $DB->get_record_sql("SELECT * FROM {quizaccess_tcquiz_session} ORDER BY timestamp DESC LIMIT 1",array('quizid' => $quizid));
-if (!$tcquiz = $DB->get_record('quizaccess_tcquiz_session', array('joincode' => $joincode))){
+//if (!$tcquiz = $DB->get_record('quizaccess_tcquiz_session', array('joincode' => $joincode))){
+if (!$tcquiz = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid))){
   tcquiz_send_error("TCQuiz Session incorrect");
   tcquiz_end_response();
   die();
@@ -135,7 +137,12 @@ else {
 
           case TCQUIZ_STATUS_SHOWRESULTS: // Results being displayed.
 
-                  if ($requesttype == "getresults" ) {
+            echo '<status>showresults</status>';
+            echo '<url>';
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',['page' => $tcquiz->currentpage, 'showall' => 'false', 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id ]);
+            echo '</url>';
+
+            /*      if ($requesttype == "getresults" ) {
                     echo '<status>showresults</status>';
                     echo '<url>';
                     echo new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',['page' => $tcquiz->currentpage, 'showall' => 'false', 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id ]);
@@ -145,15 +152,23 @@ else {
                 else {
                   echo '<status>noaction</status>';
                 }
-
+*/
               break;
 
           case TCQUIZ_STATUS_FINALRESULTS: // Showing the final totals, etc.
+              //$_GET["cmid"]=$cmid;
+              $_GET["attemptid"]=$attempt;
 
               echo '<status>finalresults</status>';
               echo '<classresult>';
-
+              include($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/submitattempt.php');
               echo 'Well done!</classresult>';
+
+              echo '<url>';
+              echo new moodle_url('/mod/quiz/accessrule/tcquiz/report_student_final_results.php',['attemptid' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'tcqsid' => $tcquiz->id ]);
+              echo '</url>';
+
+
               break;
 
           default:
