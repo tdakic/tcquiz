@@ -193,52 +193,52 @@ class startattempt_test extends \advanced_testcase {
     2. If there is an existing teacher attempt, make sure that the attempt is finished and the session is finished and new session and
       tcq attempt created
   */
-public function test_teacherstartquiz(){
-  global $DB;
-  $this->resetAfterTest(true);
+  public function test_teacherstartquiz(){
+    global $DB;
+    $this->resetAfterTest(true);
 
-  list($quizobj,$quiz,$course,$quba) = $this->create_quiz_and_attempt_with_layout('1,2,0,3,4,0,5,6,0');
+    list($quizobj,$quiz,$course,$quba) = $this->create_quiz_and_attempt_with_layout('1,2,0,3,4,0,5,6,0');
 
-  $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
-  $this->setUser($teacher);
+    $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
+    $this->setUser($teacher);
 
-  $timenow = time();
-  $accessmanager = $quizobj->get_access_manager($timenow);
+    $timenow = time();
+    $accessmanager = $quizobj->get_access_manager($timenow);
 
-  list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
-      quiz_validate_new_attempt($quizobj, $accessmanager, true, -1, false);
+    list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
+        quiz_validate_new_attempt($quizobj, $accessmanager, true, -1, false);
 
-  $newattemptid = validate_and_start_teacher_tcq_attempt($quizobj, "testcode", $lastattempt, $attemptnumber, $currentattemptid);
+    list($newattemptid,$newsessionid) = validate_and_start_teacher_tcq_attempt($quizobj, "testcode", $lastattempt, $attemptnumber, $currentattemptid);
 
-  //check that the session with the new joincode is created
-  $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode"]);
-  $this->assertNotNull($session);
+    //check that the session with the new joincode is created
+    $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode"]);
+    $this->assertNotNull($session);
 
-  //check that the teacher's attempt is inserted in the quizaccess_tcquiz_attempt table
-  $tcq_teacher_attempt = $DB->get_record("quizaccess_tcquiz_attempt", ['sessionid' => $session->id,'attemptid'=>$newattemptid]);
-  $this->assertNotNull($tcq_teacher_attempt);
+    //check that the teacher's attempt is inserted in the quizaccess_tcquiz_attempt table
+    $tcq_teacher_attempt = $DB->get_record("quizaccess_tcquiz_attempt", ['sessionid' => $session->id,'attemptid'=>$newattemptid]);
+    $this->assertNotNull($tcq_teacher_attempt);
+  
+    //teacher starts a new quiz session
+    list($currentattemptid1, $attemptnumber1, $lastattempt1, $messages1, $page1) =
+        quiz_validate_new_attempt($quizobj, $accessmanager, true, -1, false);
 
-  //teacher starts a new quiz session
-  list($currentattemptid1, $attemptnumber1, $lastattempt1, $messages1, $page1) =
-      quiz_validate_new_attempt($quizobj, $accessmanager, true, -1, false);
+      list($newattemptid1,$newsessionid1) = validate_and_start_teacher_tcq_attempt($quizobj, "testcode1", $lastattempt1, $attemptnumber1, $currentattemptid1);
 
-  $newattemptid1 = validate_and_start_teacher_tcq_attempt($quizobj, "testcode1", $lastattempt1, $attemptnumber1, $currentattemptid1);
+    //check that the previous teacher attempt is deleted
+    $attemptt = $DB->get_record("quiz_attempts", ['id' => $newattemptid]);
+    $this->assertEquals(false, $attemptt);
 
-  //check that the previous teacher attempt is deleted
-  $attemptt = $DB->get_record("quiz_attempts", ['id' => $newattemptid]);
-  $this->assertEquals(false, $attemptt);
+    //check that the previous tcq session is in state TCQUIZ_STATUS_FINISHED == 50
+    $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode"]);
+    $this->assertEquals(50,$session->status);
 
-  //check that the previous tcq session is in state TCQUIZ_STATUS_FINISHED == 50
-  $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode"]);
-  $this->assertEquals(50,$session->status);
+    //check that the new tcq session and tcq attempt are created
+    $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode1"]);
+    $this->assertNotNull($session);
 
-  //check that the new tcq session and tcq attempt are created
-  $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode1"]);
-  $this->assertNotNull($session);
-
-  //check that the teacher's attempt is inserted in the quizaccess_tcquiz_attempt table
-  $tcq_teacher_attempt = $DB->get_record("quizaccess_tcquiz_attempt", ['sessionid' => $session->id,'attemptid'=>$newattemptid1]);
-  $this->assertNotNull($tcq_teacher_attempt);
+    //check that the teacher's attempt is inserted in the quizaccess_tcquiz_attempt table
+    $tcq_teacher_attempt = $DB->get_record("quizaccess_tcquiz_attempt", ['sessionid' => $session->id,'attemptid'=>$newattemptid1]);
+    $this->assertNotNull($tcq_teacher_attempt);
 
   }
 
