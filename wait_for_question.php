@@ -47,7 +47,7 @@ if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('quizid' => $
 
 $PAGE->set_cacheable(false);
 $PAGE->set_title($SITE->fullname);
-$url = htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_question.php',['joincode'=>$joincode, 'sessionid' => $sessionid,  'attemptid' => $attemptid, 'cmid' => $cmid, 'quizid' => $quizid ]));
+$url = htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_question.php',['sessionid' => $sessionid,  'attemptid' => $attemptid, 'cmid' => $cmid, 'quizid' => $quizid ]));
 $PAGE->set_url($url);
 
 $output = $PAGE->get_renderer('mod_quiz');
