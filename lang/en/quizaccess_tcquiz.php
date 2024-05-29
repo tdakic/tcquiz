@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['setting:pollinginterval']="Polling frequency";
 $string['setting:pollinginterval_desc']="Specify how often (in ms) the polling should be performed. Smaller values could affect the server performance. Larger value could couse tcquiz performance issues.";
+$string['pluginname'] = 'TCQuiz';
+$string['modulename'] = 'TCQuiz';
+$string['modulenameplural'] = 'TCQuizzes';
 
 $string['tcquizsettings'] = 'TCQuiz settings';
 $string['questiontime'] = 'Default question time';
@@ -106,128 +109,15 @@ $string['done'] = 'Done';
 
 //for teacher final results page
 $string['endquiz'] = 'End quiz';
-
 $string['question'] = 'Question ';
-
-
 $string['finalresults'] = 'Final results';
-
-
-
-$string['removeimage'] = 'Remove image';
-
-
-
-$string['addanswers'] = 'Add space for 3 more answers';
-$string['addquestion'] = 'Add question';
-$string['addingquestion'] = 'Adding question ';
-$string['allquestions'] = 'Back to full results';
-$string['allsessions'] = 'All Sessions';
-$string['alreadyanswered'] = 'You have already answered this question';
-$string['answer'] = 'Answer ';
-$string['answers'] = 'Answers';
-$string['answersent'] = 'Answer sent - waiting for question to finish: ';
-$string['answertext'] = 'Answer text:';
-$string['awaittime'] = 'AJAX waiting time';
-$string['awaittimedesc'] = 'The setting defines the frequency in seconds to check question and result data by student browser window. When high number of quiz participants causes server slowness, this number should be increased to reduce the number of simultanious data calls. Minimum value is 1 second.';
-$string['awaittimeerror'] = 'The value should not be less than 1';
-$string['atleastoneanswer'] = 'You need at least one answer';
-$string['backquiz'] = 'Back to the TCQuiz';
-$string['backresponses'] = 'Back to the full results';
-$string['badcurrentquestion'] = 'Bad currentquestion: '; // Do not translate 'currentquestion'.
-$string['badquizid'] = 'Bad quizid: '; // Do not translate 'quizid'.
-$string['badresponse'] = 'Unexpected response from server - ';
-$string['badsesskey'] = 'Bad session key';
-$string['checkdelete'] = 'Are you sure you want to delete this question?';
-$string['choosecorrect'] = 'Set this as the correct answer';
-$string['choosesession'] = 'Choose a session to display: ';
-$string['classresult'] = 'Class result: ';
-$string['classresultcorrect'] = ' correct';
-
-$string['correct'] = 'Correct answer?';
-$string['correctnotblank'] = 'Correct answer cannot be blank';
-$string['cross'] = 'Wrong answer';
-$string['deletequestion'] = 'Delete question';
-$string['displaynext'] = 'About to display next question:';
-$string['edit'] = 'Edit quiz';
-$string['editquestions'] = 'Edit the questions';
-$string['editquestiontime'] = 'Question time (0 for default)';
-$string['edittingquestion'] = 'Editing question ';
-$string['errorquestiontext'] = 'Error: You have not filled in the question';
-$string['eventeditpageviewed'] = 'TCQuiz edit page viewed';
-$string['eventresponsesviewed'] = 'TCQuiz responses viewed';
-
-$string['hideusers'] = 'Hide users';
-$string['httperror'] = 'There was a problem with the request - status: ';
-$string['httprequestfail'] = 'Giving up :( Cannot create an XMLHTTP instance';
-$string['incorrectstatus'] = 'Quiz has incorrect status: \'';
-$string['incorrectrequestype'] = 'Incorrect requesttype: \'';
-$string['invalidanswer'] = 'Invalid answer number ';
-
-
-$string['modulename'] = 'TCQuiz';
-$string['modulenameplural'] = 'TCQuizzes';
-
 $string['nextquestion'] = 'Next question';
 $string['noanswers'] = 'No answers given';
-$string['nocorrect'] = 'No \'right\' answer';
-$string['noquestion'] = 'Bad response - no question data: ';
-$string['nosessions'] = 'This TCQuiz has not yet been attempted';
+
 $string['notallowedattempt'] = 'You are not allowed to attempt this quiz';
 $string['notauthorised'] = 'You are not authorised to control this quiz';
-$string['onecorrect'] = 'Error: There must be exactly one correct answer';
+
 $string['pluginadministration'] = 'TCQuiz administration';
-$string['pluginname'] = 'TCQuiz';
-$string['prevquestion'] = 'Previous question';
-$string['privacy:metadata:tcquiz_submitted'] = 'Details of an answer given to a TCQuiz question';
-$string['privacy:metadata:tcquiz_submitted:answerid'] = 'The ID of the answer that was selected';
-$string['privacy:metadata:tcquiz_submitted:questionid'] = 'The ID of the question that has been answered';
-$string['privacy:metadata:tcquiz_submitted:sessionid'] = 'The ID of the session the answer was given in';
-$string['privacy:metadata:tcquiz_submitted:userid'] = 'The ID of the user that gave the answer';
-$string['questionimage'] = '(Optional) image: ';
-
-$string['questiondelete'] = 'Delete question {$a}';
-$string['questionfinished'] = 'Question finished, waiting for results';
-$string['questionmovedown'] = 'Move question {$a} down';
-$string['questionmoveup'] = 'Move question {$a} up';
-$string['questions'] = 'Questions';
-$string['questionslist'] = 'Questions in this TCQuiz: ';
-$string['questiontext'] = 'Question text:';
-
-
-$string['quizfinished'] = 'No more questions';
-$string['tcquiz:addinstance'] = 'Add a new TCQuiz';
-$string['tcquiz:attempt'] = 'Attempt a quiz';
-$string['tcquiz:control'] = 'Start / control a quiz';
-$string['tcquiz:seeresponses'] = 'View the responses to a quiz';
-$string['tcquiz:editquestions'] = 'Edit the questions for a quiz';
-$string['tcquizintro'] = 'Introduction';
-
-
-$string['responses'] = 'View responses';
-$string['resultcorrect'] = ' correct.';
-$string['resultoverall'] = ' correct. Overall: ';
-$string['resultthisquestion'] = 'This question: ';
-$string['saveadd'] = 'Save question and add another';
-$string['scorestable'] = 'Scores table';
-$string['seeresponses'] = 'View the responses';
-$string['sendinganswer'] = 'Sending answer';
-$string['servererror'] = 'Server returned error: ';
-$string['sessions'] = 'Sessions';
-$string['showsession'] = 'Show';
-$string['showusers'] = 'Show users';
-
-$string['submissions'] = 'Submissions';
-$string['tick'] = 'Correct answer';
-$string['timeleft'] = 'Time left to answer:';
-$string['totals'] = 'Running total';
-$string['tryagain'] = 'Do you want to try again?';
-$string['unknownrequest'] = 'Unknown request: \'';
-$string['updatequestion'] = 'Save question';
-$string['view'] = 'View quiz';
-
-
-$string['yourresult'] = 'Your result: ';
 
 $string['nottcquiz'] = 'This quiz is not set up as a TCQuiz ';
 $string['notcurrentpage'] = 'You tried to access the page of the quiz that is not the page currently being displayed by the teacher.';
