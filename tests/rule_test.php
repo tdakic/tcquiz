@@ -51,18 +51,6 @@ class rule_test extends \advanced_testcase {
         $this->assertInstanceOf('quizaccess_tcquiz', $rule);
         $this->assertEquals($rule->prevent_access(),get_string('accesserror', 'quizaccess_tcquiz'));
 
-        //echo $rule->description();
-
-
-        //$this->assertTrue($rule->is_preflight_check_required(null));
-
-        //$this->assertFalse($rule->is_preflight_check_required(1));
-
-        //$errors = $rule->validate_preflight_check(array(), null, array(), 1);
-        //$this->assertArrayHasKey('tcquiz', $errors);
-
-        //$errors = $rule->validate_preflight_check(array('tcquiz' => 1), null, array(), 1);
-        //$this->assertEmpty($errors);
     }
 
     public function test_tcquiz_description_student() {
@@ -96,7 +84,6 @@ class rule_test extends \advanced_testcase {
       $this->assertStringContainsString('id="fitem_id_join_session_button"',$rule_desc);
       //and the input field - use regex? instead
       $this->assertStringContainsString('id="id_joincode"',$rule_desc);
-      
 
     }
 
@@ -136,9 +123,6 @@ class rule_test extends \advanced_testcase {
       $this->assertStringContainsString('id="id_start_new_session_button"', $rule_desc );
       //and the input field - use regex? instead
       $this->assertStringContainsString('id="id_joincode"',$rule_desc );
-
-      //var_dump($rule->description()[0]);
-
 
     }
 
