@@ -125,6 +125,18 @@ if (!$attemptobj->is_preview_user()) {
     die();
 }
 
+
+/* all cases below use session, so this should be here */
+if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('quizid' => $quizid,'id' => $sessionid))){
+  tcquiz_start_response();
+  echo "<quizid>".$quizid."</quizid>";
+
+  tcquiz_send_error("TCQuiz Session incorrect");
+  tcquiz_end_response();
+  die();
+}
+
+
 if ($requesttype == 'getquestion'){
 
       $rejoin = required_param('rejoin', PARAM_BOOL);
@@ -136,15 +148,6 @@ if ($requesttype == 'getquestion'){
         tcquiz_end_response();
         die();
 
-      }
-
-      if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('quizid' => $quizid,'id' => $sessionid))){
-        tcquiz_start_response();
-        echo "<quizid>".$quizid."</quizid>";
-
-        tcquiz_send_error("TCQuiz Session incorrect");
-        tcquiz_end_response();
-        die();
       }
 
       $page_slot =  $session->currentpage;
