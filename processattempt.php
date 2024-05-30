@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php');
 
 // Remember the current time as the time any responses were submitted
-// (so as to make sure students don't get penalized for slow processing on this page).
+// To make sure students don't get penalized for slow processing on this page.
 $timenow = time();
 
 // Get submitted parameters.
@@ -70,19 +70,19 @@ $page = $thispage;
 // Check login.
 require_login($attemptobj->get_course(), false, $attemptobj->get_cm());
 
-//make sure the session exists
-if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid))){
-  throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
+// Make sure the session exists.
+if (!$session = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid])) {
+    throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
-//if the state of the quiz is different than TCQUIZ_STATUS_SHOWQUESTION =  20 or TCQUIZ_STATUS_PREVIEWQUESTION = 15 defined in locallib.php
-//possible timing issues? Is sleep(1) below enough to fix them?
-if ($session->status != TCQUIZ_STATUS_PREVIEWQUESTION  && $session->status != TCQUIZ_STATUS_SHOWQUESTION){
-  throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
+// If the state of the quiz is different than TCQUIZ_STATUS_SHOWQUESTION =  20 or TCQUIZ_STATUS_PREVIEWQUESTION = 15
+// defined in locallib.php possible timing issues? Is sleep(1) below enough to fix them?
+if ($session->status != TCQUIZ_STATUS_PREVIEWQUESTION  && $session->status != TCQUIZ_STATUS_SHOWQUESTION) {
+    throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
-//if they are trying to access a different page than what the DB is allowing
-if ($session->currentpage != $page){
-  throw new moodle_exception('notcurrentpage', 'quizaccess_tcquiz', $attemptobj->view_url());
+// If they are trying to access a different page than what the DB is allowing.
+if ($session->currentpage != $page) {
+    throw new moodle_exception('notcurrentpage', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
 // Check that this attempt belongs to this user.
@@ -120,17 +120,19 @@ if ($autosaveperiod) {
 $attemptobj->process_auto_save($timenow);
 $status = $attemptobj->process_attempt_tcq($timenow, $thispage);
 
-if (!$attemptobj->is_preview_user()){
-  $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php',['page' => $page, 'sesskey' => sesskey(),'showall' => false, 'attempt' => $attemptid, 'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]));
-  header("Location: ". $url);
-  exit;
-}
-else {
-  //TCQUIZ_STATUS_SHOWRESULTS defined in localib.php as 30
-  //sleep(1); // allows everyone to submit?
-  $session->status = TCQUIZ_STATUS_SHOWRESULTS;
-  $DB->update_record('quizaccess_tcquiz_session', $session);
-  $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',['page' => $page, 'sesskey' => sesskey(),'showall' => 0, 'attempt' => $attemptid, 'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]));
-  header("Location: ". $url);
-  exit;
+if (!$attemptobj->is_preview_user()) {
+    $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php',
+          ['page' => $page, 'sesskey' => sesskey(), 'showall' => false, 'attempt' => $attemptid,
+           'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]), ENT_NOQUOTES);
+    header("Location: ". $url);
+    exit;
+} else {
+    // TCQUIZ_STATUS_SHOWRESULTS defined in localib.php as 30.
+    $session->status = TCQUIZ_STATUS_SHOWRESULTS;
+    $DB->update_record('quizaccess_tcquiz_session', $session);
+    $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',
+         ['page' => $page, 'sesskey' => sesskey(), 'showall' => 0, 'attempt' => $attemptid,
+          'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]), ENT_NOQUOTES);
+    header("Location: ". $url);
+    exit;
 }
