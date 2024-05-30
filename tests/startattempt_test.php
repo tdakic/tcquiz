@@ -23,10 +23,9 @@ use mod_quiz\quiz_settings;
 use mod_quiz\quiz_attempt;
 
 defined('MOODLE_INTERNAL') || die();
-
 global $CFG;
+
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
-require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->dirroot.'/lib/weblib.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php');
 
@@ -39,205 +38,209 @@ require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php');
  */
 class startattempt_test extends \advanced_testcase {
 
-  /**
-   * Create quiz and attempt data with layout.
-   *
-   * @param string $layout layout to set. Like quiz attempt.layout. E.g. '1,2,0,3,4,0,'.
-   * @param string $navmethod quiz navigation method (defaults to free)
-   * @return quiz_attempt the new quiz_attempt object
-   */
-  protected function create_quiz_and_attempt_with_layout($layout, $navmethod = QUIZ_NAVMETHOD_FREE) {
-      $this->resetAfterTest(true);
+    /**
+     * Create quiz and attempt data with layout.
+     *
+     * @param string $layout layout to set. Like quiz attempt.layout. E.g. '1,2,0,3,4,0,'.
+     * @param string $navmethod quiz navigation method (defaults to free)
+     * @return quiz_attempt the new quiz_attempt object
+     */
+    protected function create_quiz_and_attempt_with_layout($layout, $navmethod = QUIZ_NAVMETHOD_FREE) {
+        $this->resetAfterTest(true);
 
-      // Make a user to do the quiz.
-      $user = $this->getDataGenerator()->create_user();
-      $course = $this->getDataGenerator()->create_course();
-      // Make a quiz.
-      $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
-      $quiz = $quizgenerator->create_instance(['course' => $course->id,
-          'grade' => 100.0, 'sumgrades' => 2, 'layout' => $layout, 'navmethod' => $navmethod]);
+        // Make a user to do the quiz.
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        // Make a quiz.
+        $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
+        $quiz = $quizgenerator->create_instance(['course' => $course->id,
+            'grade' => 100.0, 'sumgrades' => 2, 'layout' => $layout, 'navmethod' => $navmethod]);
 
-      $quizobj = quiz_settings::create($quiz->id, $user->id);
+        $quizobj = quiz_settings::create($quiz->id, $user->id);
 
+        $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+        $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 
-      $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
-      $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
+        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $cat = $questiongenerator->create_question_category();
 
-      $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-      $cat = $questiongenerator->create_question_category();
+        $page = 1;
+        foreach (explode(',', $layout) as $slot) {
+            if ($slot == 0) {
+                $page += 1;
+                continue;
+            }
 
-      $page = 1;
-      foreach (explode(',', $layout) as $slot) {
-          if ($slot == 0) {
-              $page += 1;
-              continue;
-          }
+            $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
+            quiz_add_quiz_question($question->id, $quiz, $page);
+        }
 
-          $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
-          quiz_add_quiz_question($question->id, $quiz, $page);
-      }
-
-      return [$quizobj,$quiz,$course,$quba];
-  }
-
-
-  /**
-    When the student types in a joincode and clicks on the Join quiz button on their quiz view page,
-    the mform includes validation that there is a running session of tcq with the given joincode. Currently,
-    there should only be one open session of a TCQuiz. The function really tests the function setup_tcquiz_attempt.
-    The following tests are performed:
-
-    1. student never attempted the quiz or there is no in progress attempt. New TCQ attempt is created. (
-      tested in function test_studentstartattempt_start_clean below
-    2. there is an open quiz attempt, but it is not a TCQ attempt. Finish it and create a new TCQ attempt.
-    3. there is an open quiz attempt and it is a TCQ attempt. Use it!
-
-  */
-  public function test_studentstartattempt(){
-
-    global $DB;
-    $this->resetAfterTest(true);
-
-    list($quizobj,$quiz,$course,$quba) = $this->create_quiz_and_attempt_with_layout('1,2,0,3,4,0,5,6,0');
-
-    $timenow = time();
-
-    $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
-    $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, $student->id);
-    quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
-    quiz_attempt_save_started($quizobj, $quba, $attempt);
+        return [$quizobj, $quiz, $course, $quba];
+    }
 
 
-    $this->setUser($student);
-    $attemptid = $attempt->id;
+    /**
+     *  Test student starting a tcq attempt.
+     *
+     *  When the student types in a joincode and clicks on the Join quiz button on their quiz view page,
+     *  the mform includes validation that there is a running session of tcq with the given joincode. Currently,
+     *  there should only be one open session of a TCQuiz. The function really tests the function setup_tcquiz_attempt.
+     *  The following tests are performed:
+     *
+     * 1. student never attempted the quiz or there is no in progress attempt. New TCQ attempt is created. (
+     *    tested in function test_studentstartattempt_start_clean below
+     *  2. there is an open quiz attempt, but it is not a TCQ attempt. Finish it and create a new TCQ attempt.
+     *  3. there is an open quiz attempt and it is a TCQ attempt. Use it!
+     *
+     */
+    public function test_studentstartattempt() {
 
-    $timenow = time();
-    $accessmanager = $quizobj->get_access_manager($timenow);
+        global $DB;
+        $this->resetAfterTest(true);
 
-    //attempt is not a tcq attempt
-    list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
-          quiz_validate_new_attempt($quizobj, $accessmanager, false, -1, false);
+        list($quizobj, $quiz, $course, $quba) = $this->create_quiz_and_attempt_with_layout('1,2,0,3,4,0,5,6,0');
 
-    $this->assertEquals($attempt->id, $currentattemptid );
+        $timenow = time();
 
-    $session_id = create_new_tcq_session("testcode", $quiz);
-    $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode"]);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, $student->id);
+        quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
+        quiz_attempt_save_started($quizobj, $quba, $attempt);
 
-    //this should close $attempt and create a new tcqattempt
-    $tcqattempt = setup_tcquiz_attempt($quizobj, $session, $currentattemptid,"testcode", $accessmanager, $attemptnumber, $lastattempt);
+        $this->setUser($student);
+        $attemptid = $attempt->id;
 
-    //get $attempt from DB because it's staus should have changed
-    $attempt = $DB->get_record("quiz_attempts", ['id' => $attempt->id]);
+        $timenow = time();
+        $accessmanager = $quizobj->get_access_manager($timenow);
 
-    //since the $attempt was not a TCQ attempt, setup_tcquiz_attempt should close it and create a new TCQ attempt
-    $this->assertEquals($attempt->state, \mod_quiz\quiz_attempt::FINISHED);
+        // Attempt is not a tcq attempt.
+        list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
+              quiz_validate_new_attempt($quizobj, $accessmanager, false, -1, false);
 
-    $this->assertNotEquals($tcqattempt, $currentattemptid);
+        $this->assertEquals($attempt->id, $currentattemptid );
 
-    //Now $tcqattempt is the id of a tcq attempt, so when calling quiz_validate_new_attempt and setup_tcquiz_attempt, we should get $tcqattempt back
+        $sessionid = create_new_tcq_session("testcode", $quiz);
+        $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id, 'joincode' => "testcode"]);
 
-    list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
-          quiz_validate_new_attempt($quizobj, $accessmanager, false, -1, false);
-    $y = setup_tcquiz_attempt($quizobj, $session, $currentattemptid,"testcode", $accessmanager, $attemptnumber, $lastattempt);
+        // This should close $attempt and create a new tcqattempt.
+        $tcqattempt = setup_tcquiz_attempt($quizobj, $session, $currentattemptid, "testcode",
+                                                              $accessmanager, $attemptnumber, $lastattempt);
 
-    $this->assertEquals($tcqattempt, $y);
+        // Get $attempt from DB because it's staus should have changed.
+        $attempt = $DB->get_record("quiz_attempts", ['id' => $attempt->id]);
 
-  }
+        // Since the $attempt was not a TCQ attempt, setup_tcquiz_attempt should close it and create a new TCQ attempt.
+        $this->assertEquals($attempt->state, \mod_quiz\quiz_attempt::FINISHED);
 
-  /** continuation of the above tests. Test
-  1. student never attempted the quiz or there is no in progress attempt. New TCQ attempt is created.
-  */
-  public function test_studentstartattempt_start_clean(){
+        $this->assertNotEquals($tcqattempt, $currentattemptid);
 
-    global $DB;
-    $this->resetAfterTest(true);
+        // Now $tcqattempt is the id of a tcq attempt, so when calling quiz_validate_new_attempt and setup_tcquiz_attempt,
+        // we should get $tcqattempt back.
 
-    list($quizobj,$quiz,$course,$quba) = $this->create_quiz_and_attempt_with_layout('1,2,0,3,4,0,5,6,0');
+        list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
+              quiz_validate_new_attempt($quizobj, $accessmanager, false, -1, false);
+        $y = setup_tcquiz_attempt($quizobj, $session, $currentattemptid, "testcode", $accessmanager, $attemptnumber, $lastattempt);
 
-    $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
-    $this->setUser($student);
+        $this->assertEquals($tcqattempt, $y);
 
+    }
 
-    $timenow = time();
-    $accessmanager = $quizobj->get_access_manager($timenow);
+    /**
+     * Continuation of the above tests. Test
+     * 1. student never attempted the quiz or there is no in progress attempt. New TCQ attempt is created.
+     */
+    public function test_studentstartattempt_start_clean() {
 
-    list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
-          quiz_validate_new_attempt($quizobj, $accessmanager, false, -1, false);
+        global $DB;
+        $this->resetAfterTest(true);
 
-    //$this->assertEquals( $attempt->id,$currentattemptid );
+        list($quizobj, $quiz, $course, $quba) = $this->create_quiz_and_attempt_with_layout('1,2,0,3,4,0,5,6,0');
 
-    $session_id = create_new_tcq_session("testcode",$quiz);
-    $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode"]);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->setUser($student);
 
-    $x = setup_tcquiz_attempt($quizobj, $session, $currentattemptid,"testcode", $accessmanager, $attemptnumber, $lastattempt);
+        $timenow = time();
+        $accessmanager = $quizobj->get_access_manager($timenow);
 
-    //check that new entries are created in the DB
-    $attempt = $DB->get_record("quiz_attempts", ['quiz' => $quiz->id,'userid'=>$student->id, 'state'=>\mod_quiz\quiz_attempt::IN_PROGRESS]);
-    $this->assertNotNull($attempt);
+        list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
+              quiz_validate_new_attempt($quizobj, $accessmanager, false, -1, false);
 
+        $sessionid = create_new_tcq_session("testcode", $quiz);
+        $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id, 'joincode' => "testcode"]);
 
-    $tcq_attempt = $DB->get_record("quizaccess_tcquiz_attempt", ['attemptid' => $x,'sessionid'=>$session_id]);
-    $this->assertNotNull($tcq_attempt);
+        $x = setup_tcquiz_attempt($quizobj, $session, $currentattemptid, "testcode", $accessmanager, $attemptnumber, $lastattempt);
 
-  }
+        // Check that new entries are created in the DB.
+        $attempt = $DB->get_record("quiz_attempts", ['quiz' => $quiz->id, 'userid' => $student->id,
+                                                     'state' => \mod_quiz\quiz_attempt::IN_PROGRESS]);
+        $this->assertNotNull($attempt);
 
-  /**
-    When the teacher types in a joincode and clicks on the Start new quiz quiz button on their quiz view page,
-    the mform includes validation ensures that the joincode is not empty and that there is no tcq session with the same joincode.
+        $tcqattempt = $DB->get_record("quizaccess_tcquiz_attempt", ['attemptid' => $x, 'sessionid' => $sessionid]);
+        $this->assertNotNull($tcqattempt);
 
-    This function really tests validate_and_start_teacher_tcq_attempt function to make sure that:
-    1. When the teacher starts anew, new quiz attempt is created, new tcq session is created and new tcq attempt is created
-    2. If there is an existing teacher attempt, make sure that the attempt is finished and the session is finished and new session and
-      tcq attempt created
-  */
-  public function test_teacherstartquiz(){
-    global $DB;
-    $this->resetAfterTest(true);
+    }
 
-    list($quizobj,$quiz,$course,$quba) = $this->create_quiz_and_attempt_with_layout('1,2,0,3,4,0,5,6,0');
+    /**
+     * When the teacher types in a joincode and clicks on the Start new quiz quiz button on their quiz view page,
+     * the mform includes validation ensures that the joincode is not empty and that there is no tcq session with the same joincode.
+     *
+     * This function really tests validate_and_start_teacher_tcq_attempt function to make sure that:
+     * 1. When the teacher starts anew, new quiz attempt is created, new tcq session is created and new tcq attempt is created
+     * 2. If there is an existing teacher attempt, make sure that the attempt is finished and the session is finished and new
+     *    session and tcq attempt created
+     */
+    public function test_teacherstartquiz() {
+        global $DB;
+        $this->resetAfterTest(true);
 
-    $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
-    $this->setUser($teacher);
+        list($quizobj, $quiz, $course, $quba) = $this->create_quiz_and_attempt_with_layout('1,2,0,3,4,0,5,6,0');
 
-    $timenow = time();
-    $accessmanager = $quizobj->get_access_manager($timenow);
+        $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
+        $this->setUser($teacher);
 
-    //create a new quiz attempt
-    list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
-        quiz_validate_new_attempt($quizobj, $accessmanager, true, -1, false);
+        $timenow = time();
+        $accessmanager = $quizobj->get_access_manager($timenow);
 
-    list($newattemptid,$newsessionid) = validate_and_start_teacher_tcq_attempt($quizobj, "testcode", $lastattempt, $attemptnumber, $currentattemptid);
+        // Create a new quiz attempt.
+        list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
+            quiz_validate_new_attempt($quizobj, $accessmanager, true, -1, false);
 
-    //check that the session with the new joincode is created
-    $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode"]);
-    $this->assertNotNull($session);
+        list($newattemptid, $newsessionid) = validate_and_start_teacher_tcq_attempt($quizobj, "testcode",
+                                                                $lastattempt, $attemptnumber, $currentattemptid);
 
-    //check that the teacher's attempt is inserted in the quizaccess_tcquiz_attempt table
-    $tcq_teacher_attempt = $DB->get_record("quizaccess_tcquiz_attempt", ['sessionid' => $session->id,'attemptid'=>$newattemptid]);
-    $this->assertNotNull($tcq_teacher_attempt);
+        // Check that the session with the new joincode is created.
+        $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id, 'joincode' => "testcode"]);
+        $this->assertNotNull($session);
 
-    //teacher starts a new quiz session while the old one is still active
-    list($currentattemptid1, $attemptnumber1, $lastattempt1, $messages1, $page1) =
-        quiz_validate_new_attempt($quizobj, $accessmanager, true, -1, false);
+        // Check that the teacher's attempt is inserted in the quizaccess_tcquiz_attempt table.
+        $tcqteacherattempt = $DB->get_record("quizaccess_tcquiz_attempt",
+                                            ['sessionid' => $session->id, 'attemptid' => $newattemptid]);
+        $this->assertNotNull($tcqteacherattempt);
 
-    list($newattemptid1,$newsessionid1) = validate_and_start_teacher_tcq_attempt($quizobj, "testcode1", $lastattempt1, $attemptnumber1, $currentattemptid1);
+        // Teacher starts a new quiz session while the old one is still active.
+        list($currentattemptid1, $attemptnumber1, $lastattempt1, $messages1, $page1) =
+            quiz_validate_new_attempt($quizobj, $accessmanager, true, -1, false);
 
-    //check that the previous teacher attempt is deleted
-    $attemptt = $DB->get_record("quiz_attempts", ['id' => $newattemptid]);
-    $this->assertEquals(false, $attemptt);
+        list($newattemptid1, $newsessionid1) = validate_and_start_teacher_tcq_attempt($quizobj, "testcode1",
+                                                            $lastattempt1, $attemptnumber1, $currentattemptid1);
 
-    //check that the previous tcq session is in state TCQUIZ_STATUS_FINISHED == 50
-    $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'id'=>$newsessionid]);
-    $this->assertEquals(TCQUIZ_STATUS_FINISHED, $session->status);
+        // Check that the previous teacher attempt is deleted.
+        $attemptt = $DB->get_record("quiz_attempts", ['id' => $newattemptid]);
+        $this->assertEquals(false, $attemptt);
 
-    //check that the new tcq session and tcq attempt are created
-    $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>"testcode1"]);
-    $this->assertNotNull($session);
+        // Check that the previous tcq session is in state TCQUIZ_STATUS_FINISHED == 50.
+        $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id, 'id' => $newsessionid]);
+        $this->assertEquals(TCQUIZ_STATUS_FINISHED, $session->status);
 
-    //check that the teacher's attempt is inserted in the quizaccess_tcquiz_attempt table
-    $tcq_teacher_attempt = $DB->get_record("quizaccess_tcquiz_attempt", ['sessionid' => $newattemptid1,'attemptid'=>$newattemptid1]);
-    $this->assertNotNull($tcq_teacher_attempt);
+        // Check that the new tcq session and tcq attempt are created.
+        $session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id, 'joincode' => "testcode1"]);
+        $this->assertNotNull($session);
 
-  }
+        // Check that the teacher's attempt is inserted in the quizaccess_tcquiz_attempt table.
+        $tcqteacherattempt = $DB->get_record("quizaccess_tcquiz_attempt",
+                                            ['sessionid' => $newattemptid1, 'attemptid' => $newattemptid1]);
+        $this->assertNotNull($tcqteacherattempt);
+
+    }
 
 }

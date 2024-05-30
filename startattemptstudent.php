@@ -17,12 +17,10 @@
 /**
  * This script deals with starting a new attempt of a tcquiz for students.
  *
-* @package   quizaccess_tcquiz
-* @copyright April 2024 Tamara Dakic @Capilano University
-* @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
-
-
+ * @package   quizaccess_tcquiz
+ * @copyright April 2024 Tamara Dakic @Capilano University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 /*  Adapted for tcquiz from mod_quiz startattempt.php by Tamara Dakic
 
@@ -40,25 +38,21 @@
 
 */
 
-
 namespace quizaccess_tcquiz;
 
-//use mod_quiz\quiz_attempt;
 use mod_quiz\quiz_settings;
 
+require_once(__DIR__ . '/../../../../config.php');
 global $DB, $CFG, $PAGE;
 
-require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php');
-//for constants only (to finish a student attempt if needed)
-//require_once($CFG->dirroot . '/mod/quiz/classes/quiz_attempt.php');
 
 // Get submitted parameters.
-$id = required_param('cmid', PARAM_INT); // Course module id
+$id = required_param('cmid', PARAM_INT); // Course module id.
 $page = optional_param('page', -1, PARAM_INT); // Page to jump to in the attempt.
 $joincode = required_param('joincode', PARAM_ALPHANUM);
-$forcenew = false; //this script is also used for students reconnecting to the quiz
+$forcenew = false; // This script is also used for students reconnecting to the quiz.
 
 $quizobj = quiz_settings::create_for_cmid($id, $USER->id);
 
@@ -68,7 +62,6 @@ $PAGE->set_cacheable(false);
 // Check login and sesskey.
 require_login($quizobj->get_course(), false, $quizobj->get_cm());
 require_sesskey();
-//$PAGE->set_heading($quizobj->get_course()->fullname);
 
 // If no questions have been set up yet redirect to edit.php or display an error.
 if (!$quizobj->has_questions()) {
@@ -86,15 +79,13 @@ $accessmanager = $quizobj->get_access_manager($timenow);
 $context = $quizobj->get_context();
 $quiz = $quizobj->get_quiz();
 
-$session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>$joincode]);
+$session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id, 'joincode' => $joincode]);
 
-
-//student tried to join but either there was no tcquiz with such joincode, or the quiz was not running
-if (!$session ){
+// Student tried to join but either there was no tcquiz with such joincode, or the quiz was not running.
+if (!$session) {
     echo -2;
     return;
-}
-else if ($session->status == 0 || $session->status == 50) {
+} else if ($session->status == 0 || $session->status == 50) {
     echo -3;
     return;
 }
@@ -103,7 +94,7 @@ else if ($session->status == 0 || $session->status == 50) {
 list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
       quiz_validate_new_attempt($quizobj, $accessmanager, $forcenew, $page, false);
 
-// Check access. OK if the only message is from TCQuiz
+// Check access. OK if the only message is from TCQuiz.
 $key = array_search(get_string('accesserror', 'quizaccess_tcquiz'), $messages);
 unset($messages[$key]);
 
@@ -112,15 +103,17 @@ if (!$quizobj->is_preview_user() && $messages) {
             $output->access_messages($messages));
 }
 
-//This function checks if the $currentattemptid corresponds to an attempt of a TCQuiz. If yes, it returns $currentattemptid
-//If no, the function closes the attempt whose id is $currentattemptid, creates a new quiz attempt and associates the
-//quiz attempt with the TCQ attempt and TCQ session and returns its id
-//PRE: $joincode is a code of running TCQ session
+// The function setup_tcquiz_attempt checks if the $currentattemptid corresponds to an attempt of a TCQuiz.
+// If yes, it returns $currentattemptid.
+// If no, the function closes the attempt whose id is $currentattemptid, creates a new quiz attempt and associates the
+// quiz attempt with the TCQ attempt and TCQ session and returns its id.
+// PRE: $joincode is a code of running TCQ session.
 
-$attempt_id = setup_tcquiz_attempt($quizobj, $session, $currentattemptid, $joincode,$accessmanager,$attemptnumber, $lastattempt);
+$attemptid = setup_tcquiz_attempt($quizobj, $session, $currentattemptid, $joincode, $accessmanager, $attemptnumber, $lastattempt);
 
-$url =  htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_question.php',
-  ['sessionid'=>$session->id, 'cmid' => $id, 'quizid'=> $quiz->id, 'attemptid'=>$attempt_id,  'sesskey' => sesskey()]));
+$url = htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_question.php',
+  ['sessionid' => $session->id, 'cmid' => $id, 'quizid' => $quiz->id,
+   'attemptid' => $attemptid,  'sesskey' => sesskey()]), ENT_NOQUOTES);
 
 header("Location: ". $url);
 die();

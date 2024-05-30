@@ -30,18 +30,16 @@
 
 namespace quizaccess_tcquiz;
 
-//use mod_quiz\quiz_attempt;
 use mod_quiz\quiz_settings;
 
+require_once(__DIR__ . '/../../../../config.php');
 global $DB, $CFG, $PAGE;
 
-require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/locallib.php');
-//require_once($CFG->dirroot . '/mod/quiz/classes/quiz_attempt.php');
 
 // Get submitted parameters.
-$id = required_param('cmid', PARAM_INT); // Course module id
+$id = required_param('cmid', PARAM_INT); // Course module id.
 $joincode = required_param('joincode', PARAM_ALPHANUM);
 $quizid = optional_param('quizid', -1, PARAM_INT);
 
@@ -81,10 +79,10 @@ $accessmanager = $quizobj->get_access_manager($timenow);
 $context = $quizobj->get_context();
 $quiz = $quizobj->get_quiz();
 
-$tcquiz_session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>$joincode]);
-//teacher wants to create a new session, but a session with the same name exists - this should have been
-//handled by the form validation
-if ($tcquiz_session){
+$tcquizsession = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id, 'joincode' => $joincode]);
+// Teacher wants to create a new session, but a session with the same name exists - this should have been
+// handled by the form validation.
+if ($tcquizsession) {
     throw new \moodle_exception('sessionexisterror', 'quizaccess_tcquiz', $quizobj->view_url());
 }
 
@@ -92,11 +90,12 @@ if ($tcquiz_session){
 list($currentattemptid, $attemptnumber, $lastattempt, $messages, $page) =
     quiz_validate_new_attempt($quizobj, $accessmanager, $forcenew, $page, false);
 
-list($new_attempt_id, $new_sess_id) = validate_and_start_teacher_tcq_attempt( $quizobj, $joincode, $lastattempt, $attemptnumber, $currentattemptid);
-//$tcquiz_session = $DB->get_record("quizaccess_tcquiz_session", ['quizid' => $quiz->id,'joincode'=>$joincode]);
+list($newattemptid, $newsessid) = validate_and_start_teacher_tcq_attempt( $quizobj, $joincode, $lastattempt,
+                                                                            $attemptnumber, $currentattemptid);
 
-$url =  htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_students.php',
-  ['sessionid'=>$new_sess_id, 'joincode'=>$joincode, 'cmid' => $id, 'quizid'=> $quiz->id, 'attemptid'=>$new_attempt_id,  'sesskey' => sesskey()]));
+$url = htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_students.php',
+   ['sessionid' => $newsessid, 'joincode' => $joincode, 'cmid' => $id, 'quizid' => $quiz->id,
+    'attemptid' => $newattemptid,  'sesskey' => sesskey()]), ENT_NOQUOTES);
 
 header("Location: ". $url);
 die();
