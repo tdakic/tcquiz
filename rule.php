@@ -213,7 +213,7 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
 
                     $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/teacherstartquiz.php',
                         ['joincode' => $fromform->joincode, 'cmid' => $this->quiz->cmid, 'quizid' => $this->quiz->id,
-                          'sesskey' => sesskey()]));
+                          'sesskey' => sesskey()]), ENT_NOQUOTES);
 
                     header("Location: ". $url);
                     die();
@@ -234,7 +234,7 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
 
                     $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/startattemptstudent.php',
                         ['joincode' => $fromform->joincode, 'cmid' => $this->quiz->cmid, 'quizid' => $this->quiz->id,
-                          'sesskey' => sesskey()]));
+                          'sesskey' => sesskey()]), ENT_NOQUOTES);
 
                     header("Location: ". $url);
                     die();

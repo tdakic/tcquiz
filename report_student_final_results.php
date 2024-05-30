@@ -17,10 +17,10 @@
 /**
  * This script reports the student final results.
  *
-* @package   quizaccess_tcquiz
-* @copyright 2024 Tamara Dakic @Capilano University
-* @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * @package   quizaccess_tcquiz
+ * @copyright 2024 Tamara Dakic @Capilano University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace quizaccess_tcquiz;
 
@@ -33,14 +33,12 @@ define('NO_OUTPUT_BUFFERING', true);
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/report/reportlib.php');
-require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php'); //for constants
+require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php'); // For constants.
 
-$attemptid = required_param('attemptid',PARAM_INT);
+$attemptid = required_param('attemptid', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 $quizid = optional_param('quizid', 0, PARAM_INT);
 $sessionid = required_param('tcqsid', PARAM_INT);
-
-
 
 global $DB, $CFG, $PAGE;
 
@@ -66,41 +64,39 @@ require_login($attemptobj->get_course(), false, $attemptobj->get_cm());
 
 // Check that this attempt belongs to this user.
 if ($attemptobj->get_userid() != $USER->id) {
-        throw new \moodle_exception('notyourattempt', 'quiz', $attemptobj->view_url());
+    throw new \moodle_exception('notyourattempt', 'quiz', $attemptobj->view_url());
 }
 
-//make sure that the user that the quiz is configured as tcquiz
-if (!$tcquizsession = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid))){
-  throw new \moodle_exception('nottcquiz', 'quizaccess_tcquiz', $attemptobj->view_url());
+// Make sure that the user that the quiz is configured as tcquiz.
+if (!$tcquizsession = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid])) {
+    throw new \moodle_exception('nottcquiz', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
-var_dump($tcquizsession->status);
-var_dump($tcquizsession->id);
-var_dump($sessionid);
-//make sure it is the right time to show the results
-if ($tcquizsession->status != TCQUIZ_STATUS_FINALRESULTS){
-  throw new \moodle_exception('notrightquizstate', 'quizaccess_tcquiz', new \moodle_url('/mod/quiz/view.php',['id' => $cmid ]));
+// Make sure it is the right time to show the results.
+if ($tcquizsession->status != TCQUIZ_STATUS_FINALRESULTS) {
+    throw new \moodle_exception('notrightquizstate', 'quizaccess_tcquiz', new \moodle_url('/mod/quiz/view.php', ['id' => $cmid ]));
 }
 
 $marks = $attemptobj->get_sum_marks();
 
-$quiz = $DB->get_record('quiz', array('id' => $quizid));
+$quiz = $DB->get_record('quiz', ['id' => $quizid]);
 
-$multiplier = floatval($quiz->grade)/floatval($quiz->sumgrades);
+$multiplier = floatval($quiz->grade ) / floatval($quiz->sumgrades);
 
 $output = '';
 $output .= html_writer::start_tag('h2');
 $output .= get_string('yourfinalscore', 'quizaccess_tcquiz');
 $output .= html_writer::end_tag('h2');
 $output .= html_writer::start_tag('p');
-$output .= get_string('yourscoreis', 'quizaccess_tcquiz') . number_format($marks * $multiplier, 2). " / ".floatval($quiz->grade).'. '.get_string('yourscorecanchange', 'quizaccess_tcquiz');
+$output .= get_string('yourscoreis', 'quizaccess_tcquiz') . number_format($marks * $multiplier, 2).
+            " / ".floatval($quiz->grade).'. '.get_string('yourscorecanchange', 'quizaccess_tcquiz');
 $output .= html_writer::end_tag('p');
 
-$process_url = new \moodle_url('/mod/quiz/view.php',['id' => $cmid]);
-$PAGE->set_url($process_url);
+$processurl = new \moodle_url('/mod/quiz/view.php', ['id' => $cmid]);
+$PAGE->set_url($processurl);
 
 $output .= html_writer::start_tag('form',
-          ['action' => $process_url,
+          ['action' => $processurl,
                  'method' => 'post',
                   'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
                   'id' => 'responseform']);
