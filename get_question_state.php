@@ -26,18 +26,20 @@
 namespace quizaccess_tcquiz;
 
 require_once(__DIR__ . '/../../../../config.php');
+require_login();
+
 global $DB;
 
 $sessionid = required_param('sessionid', PARAM_INT);
 $attemptid = required_param('attempt', PARAM_INT);
 
-//add privilege checks??? what should be checked - using this at the wrong time?
-//a lot DB querries (because of polling) for nothing ???
-//What if someone knows the state of the questions? Doesn't sound like a big deal.
+// Add privilege checks??? what should be checked - using this at the wrong time?
+// A lot DB querries (because of polling) for nothing ???
+// What if someone knows the state of the questions? Doesn't sound like a big deal.
 
 require_sesskey();
 
-$session = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid));
+$session = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid]);
 
 header('content-type: text');
 echo $session->currentpagestate;
