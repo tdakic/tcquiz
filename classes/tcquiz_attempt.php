@@ -16,6 +16,12 @@
 
 namespace quizaccess_tcquiz;
 
+use question_engine;
+use mod_quiz\question\display_options;
+use mod_quiz\quiz_attempt;
+use mod_quiz\access_manager;
+use mod_quiz\output\renderer;
+
 /**
  * This class adds tcq functionallity to a quiz attempt
  *
@@ -23,86 +29,85 @@ namespace quizaccess_tcquiz;
  * @copyright 2024 Tamara Dakic @ Capilano University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use question_engine;
-//use question_display_options;
-use mod_quiz\question\display_options;
-use mod_quiz\quiz_attempt;
-use mod_quiz\access_manager;
-//use quizaccess_tcquiz\output\renderer;
-use mod_quiz\output\renderer;
+class tcquiz_attempt extends quiz_attempt {
 
-class tcquiz_attempt extends quiz_attempt{
+    /**
+     * Constructor - just call the parent class constructor
+     *
+     * @param stdClass $attempt the row of the quiz_attempts table.
+     * @param stdClass $quiz the quiz object for this attempt and user.
+     * @param stdClass|cm_info $cm the course_module object for this quiz.
+     * @param stdClass $course the row from the course table for the course we belong to.
+     * @param bool $loadquestions (optional) if true, the default, load all the details
+     *      of the state of each question. Else just set up the basic details of the attempt.
+     */
+    public function __construct($attempt, $quiz, $cm, $course, $loadquestions = true) {
+        parent::__construct($attempt, $quiz, $cm, $course, $loadquestions);
+    }
 
-  public function __construct($attempt, $quiz, $cm, $course, $loadquestions = true) {
-    parent::__construct($attempt, $quiz, $cm, $course, $loadquestions);
-  }
+    /**
+     * Used by {create()} and {create_from_usage_id()}.
+     *
+     * @param array $conditions passed to $DB->get_record('quiz_attempts', $conditions).
+     * @return quiz_attempt the desired instance of this class.
+     */
+    protected static function create_helper($conditions) {
+        global $DB;
 
-  /**
-   * Used by {create()} and {create_from_usage_id()}.
-   *
-   * @param array $conditions passed to $DB->get_record('quiz_attempts', $conditions).
-   * @return quiz_attempt the desired instance of this class.
-   */
-  protected static function create_helper($conditions) {
-      global $DB;
+        $attempt = $DB->get_record('quiz_attempts', $conditions, '*', MUST_EXIST);
+        $quiz = access_manager::load_quiz_and_settings($attempt->quiz);
+        $course = get_course($quiz->course);
+        $cm = get_coursemodule_from_instance('quiz', $quiz->id, $course->id, false, MUST_EXIST);
 
-      $attempt = $DB->get_record('quiz_attempts', $conditions, '*', MUST_EXIST);
-      $quiz = access_manager::load_quiz_and_settings($attempt->quiz);
-      $course = get_course($quiz->course);
-      $cm = get_coursemodule_from_instance('quiz', $quiz->id, $course->id, false, MUST_EXIST);
+        // Update quiz with override information.
+        $quiz = quiz_update_effective_access($quiz, $attempt->userid);
 
-      // Update quiz with override information.
-      $quiz = quiz_update_effective_access($quiz, $attempt->userid);
+        return new tcquiz_attempt($attempt, $quiz, $cm, $course);
+    }
 
-      return new tcquiz_attempt($attempt, $quiz, $cm, $course);
-  }
+    /**
+     * Static function to create a new quiz_attempt object given an attemptid.
+     *
+     * @param int $attemptid the attempt id.
+     * @return quiz_attempt the new quiz_attempt object
+     */
+    public static function create($attemptid) {
+        return self::create_helper(['id' => $attemptid]);
+    }
 
-  /**
-   * Static function to create a new quiz_attempt object given an attemptid.
-   *
-   * @param int $attemptid the attempt id.
-   * @return quiz_attempt the new quiz_attempt object
-   */
-  public static function create($attemptid) {
-      return self::create_helper(['id' => $attemptid]);
-  }
+    /**
+     * Wrapper that the correct display_options for this tcquiz at the
+     * moment.
+     * Added fixed review display options - could possibly be a part of TCQ configuration?
+     *
+     * @param bool $reviewing true for options when reviewing, false for when attempting.
+     * @return question_display_options the render options for this user on this attempt.
+     */
+    public function get_display_options($reviewing) {
 
-  /**
-   * Wrapper that the correct display_options for this tcquiz at the
-   * moment.
-   * Added fixed review display options - could possibly be a part of TCQ configuration?
-   *
-   * @param bool $reviewing true for options when reviewing, false for when attempting.
-   * @return question_display_options the render options for this user on this attempt.
-   */
-  public function get_display_options($reviewing) {
+        if ($reviewing) {
+            if (is_null($this->reviewoptions)) {
+                $this->reviewoptions = quiz_get_review_options($this->get_quiz(),
+                        $this->attempt, $this->quizobj->get_context());
+                if ($this->is_own_preview()) {
+                    // It should  always be possible for a teacher to review their
+                    // own preview irrespective of the review options settings.
+                    $this->reviewoptions->attempt = true;
+                }
+            }
 
-      if ($reviewing) {
-          if (is_null($this->reviewoptions)) {
-              $this->reviewoptions = quiz_get_review_options($this->get_quiz(),
-                      $this->attempt, $this->quizobj->get_context());
-              if ($this->is_own_preview()) {
-                  // It should  always be possible for a teacher to review their
-                  // own preview irrespective of the review options settings.
-                  $this->reviewoptions->attempt = true;
-              }
-          }
-          //TTT added
-          $this->reviewoptions->feedback = display_options::VISIBLE;
-          $this->reviewoptions->overallfeedback = display_options::VISIBLE;
-          $this->reviewoptions->generalfeedback = display_options::VISIBLE;
-          $this->reviewoptions->numpartscorrect = display_options::VISIBLE;
-          $this->reviewoptions->correctness = display_options::VISIBLE;
-          //deprecated
-          //$this->reviewoptions->specificfeedback = display_options::VISIBLE;
-          $this->reviewoptions->rightanswer = display_options::VISIBLE;
-          $this->reviewoptions->marks = display_options::VISIBLE;
-          $this->reviewoptions->correctness = display_options::VISIBLE;
-          $this->reviewoptions->flags = display_options::EDITABLE;
-          //var_dump($this->reviewoptions);
-          return $this->reviewoptions;
-        }
-        else { //attempting
+            $this->reviewoptions->feedback = display_options::VISIBLE;
+            $this->reviewoptions->overallfeedback = display_options::VISIBLE;
+            $this->reviewoptions->generalfeedback = display_options::VISIBLE;
+            $this->reviewoptions->numpartscorrect = display_options::VISIBLE;
+            $this->reviewoptions->correctness = display_options::VISIBLE;
+
+            $this->reviewoptions->rightanswer = display_options::VISIBLE;
+            $this->reviewoptions->marks = display_options::VISIBLE;
+            $this->reviewoptions->correctness = display_options::VISIBLE;
+            $this->reviewoptions->flags = display_options::EDITABLE;
+            return $this->reviewoptions;
+        } else { // Attempting.
             $options = display_options::make_from_quiz($this->get_quiz(),
                     display_options::DURING);
             $options->attempt = true;
@@ -119,20 +124,20 @@ class tcquiz_attempt extends quiz_attempt{
      * @param bool $reviewing is the being printed on an attempt or a review page.
      * @param renderer $renderer the quiz renderer.
      * @param moodle_url $thispageurl the URL of the page this question is being printed on.
-     * @param bool  $is_preview_user is the user for whom the question is being rendered a preview user
+     * @param bool  $ispreviewuser is the user for whom the question is being rendered a preview user
      * @return string HTML for the question in its current state.
      */
-    public function render_question($slot, $reviewing, renderer $renderer, $thispageurl = null, $is_preview_user = false) {
+    public function render_question($slot, $reviewing, renderer $renderer, $thispageurl = null, $ispreviewuser = false) {
 
-      $displayoptions = clone($this->get_display_options($reviewing));
+        $displayoptions = clone($this->get_display_options($reviewing));
 
-      //no flags for teacher
-      if ($is_preview_user){
-        // also set  $editquestionparams?
-        $displayoptions->flags = 0;
-      }
-      //this is the code from render_question_helper
-      if ($this->is_blocked_by_previous_question($slot)) {
+        // No flags for teacher.
+        if ($ispreviewuser) {
+            // Also set  $editquestionparams?
+            $displayoptions->flags = 0;
+        }
+        // This is the code from render_question_helper.
+        if ($this->is_blocked_by_previous_question($slot)) {
             $placeholderqa = $this->make_blocked_question_placeholder($slot);
             $displayoptions->manualcomment = question_display_options::HIDDEN;
             $displayoptions->history = question_display_options::HIDDEN;
@@ -236,14 +241,14 @@ class tcquiz_attempt extends quiz_attempt{
         global $DB;
 
         $transaction = $DB->start_delegated_transaction();
-        $slots_on_this_page = $this->get_slots($thispage);
+        $slotsonthispage = $this->get_slots($thispage);
 
         try {
-          $this->quba->process_all_actions($timestamp);
-          foreach ($slots_on_this_page as $slot) {
-            $this->quba->finish_question($slot,$timenow);
-          }
-          question_engine::save_questions_usage_by_activity($this->quba);
+            $this->quba->process_all_actions($timestamp);
+            foreach ($slotsonthispage as $slot) {
+                $this->quba->finish_question($slot, $timenow);
+            }
+            question_engine::save_questions_usage_by_activity($this->quba);
 
         } catch (question_out_of_sequence_exception $e) {
             throw new moodle_exception('submissionoutofsequencefriendlymessage', 'question',
