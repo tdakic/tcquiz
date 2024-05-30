@@ -23,12 +23,32 @@
   */
 namespace quizaccess_tcquiz\output;
 
-use html_writer;
+/*use html_writer;
 use mod_quiz\question\display_options;
 //use mod_quiz\quiz_attempt;
 use quizaccess_tcquiz\tcquiz_attempt;
 use moodle_url;
+use question_display_options;*/
+
+use cm_info;
+use coding_exception;
+use context;
+use context_module;
+use html_table;
+use html_table_cell;
+use html_writer;
+use mod_quiz\access_manager;
+use mod_quiz\form\preflight_check_form;
+use mod_quiz\question\display_options;
+use mod_quiz\quiz_attempt;
+use moodle_url;
+use plugin_renderer_base;
+use popup_action;
 use question_display_options;
+use mod_quiz\quiz_settings;
+use renderable;
+use single_button;
+use stdClass;
 
 class renderer extends \mod_quiz\output\renderer {
 

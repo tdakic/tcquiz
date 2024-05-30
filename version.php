@@ -17,8 +17,8 @@
 /**
  * Version information for the quizaccess_honestycheck plugin.
  *
- * @package   quizaccess_honestycheck
- * @copyright 2011 The Open University
+ * @package   quizaccess_tcquiz
+ * @copyright 2024 Tamara Dakic @Capilano University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

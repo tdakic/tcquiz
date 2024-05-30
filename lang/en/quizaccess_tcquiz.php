@@ -17,15 +17,15 @@
 /**
  * English language strings
  *
- * @copyright Davo Smith <moodle@davosmith.co.uk>
- * @package quizacess_tcqquiz
+ * @copyright 2024 Tamara Dakic @Capilano University
+ * @package quizaccess_tcquiz
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['setting:pollinginterval']="Polling frequency";
-$string['setting:pollinginterval_desc']="Specify how often (in ms) the polling should be performed. Smaller values could affect the server performance. Larger value could couse tcquiz performance issues.";
+$string['setting:pollinginterval'] = "Polling frequency";
+$string['setting:pollinginterval_desc'] = "Specify how often (in ms) the polling should be performed. Smaller values could affect the server performance. Larger value could couse tcquiz performance issues.";
 $string['pluginname'] = 'TCQuiz';
 $string['modulename'] = 'TCQuiz';
 $string['modulenameplural'] = 'TCQuizzes';
@@ -38,16 +38,16 @@ $string['tcquizrequired_help'] = 'If enabled, the teacher will have the control 
 $string['yes'] = 'Yes';
 $string['no'] = 'No';
 
-//used in the rule.php
+// Used in the rule.php.
 $string['accesserror'] = 'Access to this quiz is controlled by the teacher.';
-$string['configuredastcq'] ='This quiz is configured as a TCQuiz';
+$string['configuredastcq'] = 'This quiz is configured as a TCQuiz';
 
-//teacher startpage
+// Teacher start page.
 $string['availablesession'] = 'Available session';
 $string['availablesessionsdesc'] = 'Click on <b> Rejoin </b> to reconnect to an already running session. This is primarily meant for reconnecting if your session crashed during the quiz administration. If you click on <b> End </b>, this will end the session and finish all the student attempts associated with it';
 $string['teacherstartnewinstruct'] = 'Click on the <b> Start new quiz session </b> button to start a new quiz sesion. You must provide a code for the session that the students can use to connect.';
-$string['teacherwarning']= 'If there is an <b> Available session </b> visible below, starting a new session will close that session. Be very careful, as this will close any open student attempts associated with this quiz. If in doubt and if available below, try reconnecting to the existing session.';
-$string['cantstartquiz'] ='You cannot start this quiz';
+$string['teacherwarning'] = 'If there is an <b> Available session </b> visible below, starting a new session will close that session. Be very careful, as this will close any open student attempts associated with this quiz. If in doubt and if available below, try reconnecting to the existing session.';
+$string['cantstartquiz'] = 'You cannot start this quiz';
 $string['startnewquiz'] = 'Start new quiz session';
 $string['joincode'] = 'Join code';
 $string['timestarted'] = 'Time started';
@@ -61,28 +61,28 @@ $string['wrongjoincode'] = 'Wrong join code. Try again.';
 $string['quiznotrunning'] = 'Quiz not running at the moment - wait for your teacher to start it';
 
 
-//wait_for_students page
+// Wait_for_students page.
 $string['waitstudent'] = 'Waiting for students to connect';
 $string['next'] = 'Next >>';
 $string['numconnectedstudents'] = 'Number of connected students';
 $string['clicknext'] = 'Click \'Next\' when everyone is ready';
 $string['waitfirst'] = 'Waiting for the first question to be sent';
 
-//teacher controls
+// Teacher controls.
 $string['numanswers'] = 'Number of received answers';
 $string['timeleft'] = 'Time left to answer:';
 $string['endquestion'] = 'End question';
 
-//student responseformsubmit
+// Student responseform submit.
 $string['jointcquiz'] = 'Join quiz';
 $string['entercode'] = 'Enter code given by teacher';
 $string['joininstruct'] = 'Wait until your teacher gives you the code.';
 
-//error messages in js
+// Error messages in js.
 $string['errorclosingsession'] = "Error closing the session. Try again, or start a new session.";
 $string['errorrejoining'] = "Error rejoining the session. The session is not running.";
 
-//for waitforquestion.js
+// For waitforquestion.js.
 $string['invalidserverresponse'] = "Invalid server response.";
 $string['unknownserverresponse'] = "Unknown server response: ";
 
@@ -91,23 +91,22 @@ $string['teacherjoinquizinstruct'] = 'Use this if you want to try out a quiz you
 $string['teacherstartinstruct'] = 'Use this to start a quiz for the students to take<br />Use the textbox to define a name for this session (to help when looking through the results at a later date).';
 $string['startquiz'] = 'Start quiz';
 $string['studentconnected'] = 'student connected';
-//$string['studentsconnected'] = 'students connected';
 $string['startnewquizconfirm'] = 'Are you absolutely sure you want to abandon the currently running quiz session and start a new one?';
 
-//for student attempts
+// For student attempts.
 $string['questiondonewaitforresults'] = "Question done - waiting for results.";
 $string['reconnectquiz'] = 'Reconnect to quiz';
 $string['reconnectinstruct'] = 'The quiz is already running - you can connect to this session and take control of it.';
 $string['jointcquiz'] = 'Join quiz';
 $string['joinquizasstudent'] = 'Join quiz as a student';
 
-//for student final results page
+// For student final results page.
 $string['yourfinalscore'] = 'Your final score';
 $string['yourscoreis'] = 'Your score is ';
 $string['yourscorecanchange'] = ' Your score will be changed by your teacher if they did not ask all the questions in the quiz.';
 $string['done'] = 'Done';
 
-//for teacher final results page
+// For teacher final results page.
 $string['endquiz'] = 'End quiz';
 $string['question'] = 'Question ';
 $string['finalresults'] = 'Final results';
@@ -123,4 +122,4 @@ $string['nottcquiz'] = 'This quiz is not set up as a TCQuiz ';
 $string['notcurrentpage'] = 'You tried to access the page of the quiz that is not the page currently being displayed by the teacher.';
 $string['nosession'] = 'The requested session of TCQuiz doesn not exist';
 $string['notrightquizstate'] = 'The quiz is currently in a different state.';
-$string['notyoursession']= 'You are not the teacher for this session';
+$string['notyoursession'] = 'You are not the teacher for this session';

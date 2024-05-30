@@ -41,7 +41,6 @@ $cmid = required_param('cmid', PARAM_INT);
 $quizid = required_param('quizid', PARAM_INT);
 $sessionid = required_param('sessionid', PARAM_INT);
 
-//$attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 try {
     $attemptobj = tcquiz_attempt::create($attemptid);
 } catch (moodle_exception $e) {
@@ -62,36 +61,35 @@ if (!empty($cmid) && $attemptobj->get_cmid() != $cmid) {
     throw new moodle_exception('invalidcoursemodule');
 }
 
-//make sure that the quiz is set up as a tcquiz
-if (!$tcquiz = $DB->get_record('quizaccess_tcquiz', array('quizid' => $quizid))){
-  throw new moodle_exception('nottcquiz', 'quizaccess_tcquiz', $attemptobj->view_url());
+// Make sure that the quiz is set up as a tcquiz.
+if (!$tcquiz = $DB->get_record('quizaccess_tcquiz', ['quizid' => $quizid])) {
+    throw new moodle_exception('nottcquiz', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
-//make sure that the user has the right sessionid
-if (!$tcquizsession = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid))){
-  throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
+// Make sure that the user has the right sessionid.
+if (!$tcquizsession = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid])) {
+    throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
-//if the state of the quiz is different than TCQUIZ_STATUS_SHOWQUESTION =  20 or TCQUIZ_STATUS_PREVIEWQUESTION = 15 defined in locallib.php
-//they shouldn't be attempting the quiz page
-if ($tcquizsession->status != TCQUIZ_STATUS_PREVIEWQUESTION  && $tcquizsession->status != TCQUIZ_STATUS_SHOWQUESTION){
-  throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
+
+/*  If the state of the quiz is different than TCQUIZ_STATUS_SHOWQUESTION =  20 or TCQUIZ_STATUS_PREVIEWQUESTION = 15
+    defined in locallib.php they shouldn't be attempting the quiz page */
+if ($tcquizsession->status != TCQUIZ_STATUS_PREVIEWQUESTION  && $tcquizsession->status != TCQUIZ_STATUS_SHOWQUESTION) {
+    throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
-//they are trying to access a different page than what the DB is allowing
-if ($tcquizsession->currentpage != $page){
-  throw new moodle_exception('notcurrentpage', 'quizaccess_tcquiz', $attemptobj->view_url());
+// They are trying to access a different page than what the DB is allowing.
+if ($tcquizsession->currentpage != $page) {
+    throw new moodle_exception('notcurrentpage', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
 $url = new moodle_url('/mod/quiz/view.php', ['id' => $cmid]);
 $PAGE->set_url($url);
 $PAGE->set_cacheable(false);
 
-
 require_login($attemptobj->get_course(), false, $attemptobj->get_cm());
 
 // Check that this attempt belongs to this user.
 if ($attemptobj->get_userid() != $USER->id) {
-    if ($attemptobj->has_capability('mod/quiz:viewreports')) {
-    } else {
+    if (!$attemptobj->has_capability('mod/quiz:viewreports')) {
         throw new moodle_exception('notyourattempt', 'quiz', $attemptobj->view_url());
     }
 }
@@ -102,16 +100,13 @@ if (!$attemptobj->is_preview_user()) {
     if (empty($attemptobj->get_quiz()->showblocks)) {
         $PAGE->blocks->show_only_fake_blocks();
     }
-
-} else {
-    //navigation_node::override_active_url($attemptobj->start_attempt_url());
 }
 
 // Check the access rules.
 $accessmanager = $attemptobj->get_access_manager(time());
 $messages = $accessmanager->prevent_access();
 
-//remove the message added by tcquiz
+// Remove the message added by tcquiz.
 $key = array_search(get_string('accesserror', 'quizaccess_tcquiz'), $messages);
 unset($messages[$key]);
 
@@ -137,14 +132,14 @@ $attemptobj->fire_attempt_viewed_event();
 // Get the list of questions needed by this page.
 $slots = $attemptobj->get_slots($page);
 
-// Check if there are questions
+// Check if there are questions.
 if (empty($slots)) {
     throw new moodle_exception('noquestionsfound', 'quiz', $attemptobj->view_url());
 }
 
 // Initialise the JavaScript.
 $headtags = $attemptobj->get_html_head_contributions($page);
-$PAGE->requires->js_init_call('M.mod_quiz.init_attempt_form', null, false, quiz_get_js_module()); //for the flags
+$PAGE->requires->js_init_call('M.mod_quiz.init_attempt_form', null, false, quiz_get_js_module()); // For the flags.
 \core\session\manager::keepalive(); // Try to prevent sessions expiring during quiz attempts.
 
 $PAGE->set_title($attemptobj->attempt_page_title($page));
@@ -152,11 +147,10 @@ $PAGE->add_body_class('limitedwidth');
 $PAGE->set_heading($attemptobj->get_course()->fullname);
 $PAGE->activityheader->disable();
 
-$time_left_for_question = $tcquizsession->nextendtime - time();
+$timeleftforquestion = $tcquizsession->nextendtime - time();
 
-if ($attemptobj->is_preview_user()){
-  echo $output->tcq_teacher_attempt_page($attemptobj, $page, $slots, $sessionid, sesskey(), $time_left_for_question);
-}
-else {
-  echo $output->tcq_attempt_page($attemptobj, $page, $slots, $sessionid, sesskey(), $time_left_for_question);
+if ($attemptobj->is_preview_user()) {
+    echo $output->tcq_teacher_attempt_page($attemptobj, $page, $slots, $sessionid, sesskey(), $timeleftforquestion);
+} else {
+    echo $output->tcq_attempt_page($attemptobj, $page, $slots, $sessionid, sesskey(), $timeleftforquestion);
 }

@@ -35,13 +35,16 @@ require_once($CFG->dirroot . '/mod/quiz/backup/moodle2/backup_mod_quiz_access_su
  */
 class backup_quizaccess_tcquiz_subplugin extends backup_mod_quiz_access_subplugin {
 
+    /**
+     * Define the subplugin structure
+     */
     protected function define_quiz_subplugin_structure() {
 
         // Create XML elements.
         $subplugin = $this->get_subplugin_element();
         $subpluginwrapper = new backup_nested_element($this->get_recommended_name());
         $subplugintablesettings = new backup_nested_element('quizaccess_tcquiz',
-                null, array('tcquizrequired','questiontime'));
+                null, ['tcquizrequired', 'questiontime']);
 
         // Connect XML elements into the tree.
         $subplugin->add_child($subpluginwrapper);
@@ -49,7 +52,7 @@ class backup_quizaccess_tcquiz_subplugin extends backup_mod_quiz_access_subplugi
 
         // Set source to populate the data.
         $subplugintablesettings->set_source_table('quizaccess_tcquiz',
-                array('quizid' => backup::VAR_ACTIVITYID));
+                ['quizid' => backup::VAR_ACTIVITYID]);
 
         return $subplugin;
     }

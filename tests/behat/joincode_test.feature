@@ -47,9 +47,9 @@ Feature: Test that the student needs the right code to join a TCQuiz
     | Question name                      | First question              |
     | Question text                      | Is this the first question? |
     | Correct answer                     | True                        |
-  And I am on the "TCQuiz" "mod_quiz > View" page
-  When I log out
-  And I am on the "TCQuiz" "mod_quiz > View" page logged in as "student"
+  #And I am on the "TCQuiz" "mod_quiz > View" page
+  And I log out
+  When I am on the "TCQuiz" "mod_quiz > View" page logged in as "student"
   Then I should see "Wait until your teacher gives you the code."
   And "Join quiz" "button" should be visible
   And I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "mycode"

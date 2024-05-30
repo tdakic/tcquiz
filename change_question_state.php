@@ -30,22 +30,25 @@ use mod_quiz\quiz_settings;
 require_once(__DIR__ . '/../../../../config.php');
 global $DB, $USER;
 
+require_login();
+require_sesskey();
+
 $sessionid = required_param('sessionid', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 
 $quizobj = quiz_settings::create_for_cmid($cmid, $USER->id);
 
-//make sure that the user has a valid sessionid
-if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid))){
-  throw new moodle_exception('nosession', 'quizaccess_tcquiz', $quizobj->view_url());
+// Make sure that the user has a valid sessionid.
+if (!$session = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid])) {
+    throw new moodle_exception('nosession', 'quizaccess_tcquiz', $quizobj->view_url());
 }
 
-//make sure that the user is the owner of the session
-if (!$quizobj->is_preview_user() || $session->teacherid != $USER->id){
+// Make sure that the user is the owner of the session.
+if (!$quizobj->is_preview_user() || $session->teacherid != $USER->id) {
       throw new moodle_exception('notyoursession', 'quizaccess_tcquiz', $quizobj->view_url());
 }
 
-$session->currentpagestate = 0; //not running
-$session->nextendtime = time(); //in case a student just got connected
+$session->currentpagestate = 0; // Not Running.
+$session->nextendtime = time(); // In case a student just got connected.
 
 $DB->update_record('quizaccess_tcquiz_session', $session);

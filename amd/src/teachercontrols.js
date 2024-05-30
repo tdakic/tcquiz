@@ -74,7 +74,8 @@ document.addEventListener('click', async(e) => {
             timer = null;
             const req = new XMLHttpRequest();
             req.open("POST", M.cfg.wwwroot+
-              '/mod/quiz/accessrule/tcquiz/change_question_state.php?sessionid='+sessionid+'&cmid='+cmid);
+              '/mod/quiz/accessrule/tcquiz/change_question_state.php?sessionid='+sessionid+'&cmid='+cmid+
+              '&sesskey='+ M.cfg.sesskey);
             req.send();
 
             req.onload = () => {
