@@ -24,8 +24,6 @@
 
 use mod_quiz\quiz_attempt;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * SQL to fetch relevant 'tcquiquizz_attempts' records.
  *
@@ -84,7 +82,8 @@ function tcquiz_statistics_attempts_sql($tcquizid, $sessionid, \core\dml\sql_joi
  * @param bool    $includeungraded
  * @return        \qubaid_join
  */
-function tcquiz_statistics_qubaids_condition($tcquizid, $sessionid, \core\dml\sql_join $groupstudentsjoins, $whichattempts = QUIZ_ATTEMPTLAST , $includeungraded = true) {
+function tcquiz_statistics_qubaids_condition($tcquizid, $sessionid, \core\dml\sql_join $groupstudentsjoins,
+                                             $whichattempts = QUIZ_ATTEMPTLAST , $includeungraded = true) {
     list($fromqa, $whereqa, $qaparams) = tcquiz_statistics_attempts_sql(
             $tcquizid, $sessionid, $groupstudentsjoins, $whichattempts, $includeungraded);
 

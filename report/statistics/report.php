@@ -14,14 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Quiz statistics report class.
- *
- * @package   quiz_statistics
- * @copyright 2014 Open University
- * @author    James Pratt <me@jamiep.org>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,19 +29,18 @@ use core_question\statistics\responses\analyser;
  * @copyright 2024 Tamara Dakic @ Capilano University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class tcquiz_statistics_report extends quiz_statistics_report {
 
-  /**
-   * Displays the question statistics for the teacher after the question polling ended
-   *
-   * @param stdClass         $quiz  the quiz settings.
-   * @param int              $sessionid the tcq session id
-   * @param int              $slot the slot of the question being analyzed
-   * @param stdClass         $cm course module
-   * @param stdClass         $course
-   */
-  public function tcq_display_question_stats($quiz, $sessionid, $slot, $cm, $course) {
+    /**
+     * Displays the question statistics for the teacher after the question polling ended
+     *
+     * @param stdClass         $quiz  the quiz settings.
+     * @param int              $sessionid the tcq session id
+     * @param int              $slot the slot of the question being analyzed
+     * @param stdClass         $cm course module
+     * @param stdClass         $course
+     */
+    public function tcq_display_question_stats($quiz, $sessionid, $slot, $cm, $course) {
         global $OUTPUT, $DB;
 
         raise_memory_limit(MEMORY_HUGE);
@@ -109,7 +100,6 @@ class tcquiz_statistics_report extends quiz_statistics_report {
 
         $qubaids = tcquiz_statistics_qubaids_condition($quiz->id, $sessionid, $groupstudentsjoins, $whichattempts);
 
-
         $this->table = new quiz_statistics_table();
 
         $questions = $this->load_and_initialise_questions_for_calculations($quiz);
@@ -118,7 +108,8 @@ class tcquiz_statistics_report extends quiz_statistics_report {
             // Get the data to be displayed.
             $progress = $this->get_progress_trace_instance();
             list($quizstats, $questionstats) =
-                $this->tcq_get_all_stats_and_analysis($quiz, $sessionid, $whichattempts, $whichtries, $groupstudentsjoins, $questions, $progress);
+                $this->tcq_get_all_stats_and_analysis($quiz, $sessionid, $whichattempts, $whichtries,
+                                                      $groupstudentsjoins, $questions, $progress);
         } else {
             // Or create empty stats containers.
             $quizstats = new \quiz_statistics\calculated($whichattempts);
@@ -130,10 +121,8 @@ class tcquiz_statistics_report extends quiz_statistics_report {
             throw new \moodle_exception('questiondoesnotexist', 'question');
         }
 
-
-        if ($questionstats->for_slot($slot, $variantno)->s == 0)
-        {
-          return false;
+        if ($questionstats->for_slot($slot, $variantno)->s == 0) {
+            return false;
         }
 
         return $this->output_individual_question_response_analysis($questions[$slot],
@@ -143,9 +132,6 @@ class tcquiz_statistics_report extends quiz_statistics_report {
                                                           $qubaids,
                                                           $whichtries);
     }
-
-
-
 
     /**
      * Display the response analysis for a question.
@@ -160,7 +146,7 @@ class tcquiz_statistics_report extends quiz_statistics_report {
     protected function output_individual_question_response_analysis($question, $variantno, $s, $reporturl, $qubaids,
                                                                     $whichtries = question_attempt::LAST_TRY) {
         global $OUTPUT;
-        $output_str='';
+        $outputstr = '';
 
         if (!question_bank::get_qtype($question->qtype, false)->can_analyse_responses()) {
             return false;
@@ -170,7 +156,7 @@ class tcquiz_statistics_report extends quiz_statistics_report {
 
         if (!$this->table->is_downloading()) {
             // Output an appropriate title.
-            $output_str .= $OUTPUT->heading(get_string('analysisofresponses', 'quiz_statistics'), 3);
+            $outputstr .= $OUTPUT->heading(get_string('analysisofresponses', 'quiz_statistics'), 3);
 
         } else {
             // Work out an appropriate title.
@@ -192,26 +178,17 @@ class tcquiz_statistics_report extends quiz_statistics_report {
             }
 
             // Set up the table.
-            //$output_str .= $exportclass->start_table($questiontabletitle);
 
             if ($this->table->is_downloading() == 'html') {
-                $output_str .= $this->render_question_text($question);
+                $outputstr .= $this->render_question_text($question);
             }
         }
 
         $responesanalyser = new analyser($question, $whichtries);
 
-
-        // TTT the line below might be tricky ... returning null - decided just to calculate
-        //$responseanalysis = $responesanalyser->load_cached($qubaids, $whichtries);
         $responseanalysis = $responesanalyser->calculate($qubaids, $whichtries);
 
-
-        $output_str .= $qtable->question_setup($reporturl, $question, $s, $responseanalysis);
-        if ($this->table->is_downloading()) {
-            //$exportclass->output_headers($qtable->headers);
-        }
-
+        $outputstr .= $qtable->question_setup($reporturl, $question, $s, $responseanalysis);
         // Where no variant no is specified the variant no is actually one.
         if ($variantno === null) {
             $variantno = 1;
@@ -223,22 +200,20 @@ class tcquiz_statistics_report extends quiz_statistics_report {
                 $tabledata = $responseclass->data_for_question_response_table($subpart->has_multiple_response_classes(), $partid);
                 foreach ($tabledata as $row) {
 
-                    ob_start(); // begin collecting output
-                    $output_str .= $qtable->add_data_keyed($qtable->format_row($row));
-                    $tmp_row = ob_get_clean();
+                    ob_start(); // Begin collecting output.
+                    $outputstr .= $qtable->add_data_keyed($qtable->format_row($row));
+                    $tmprow = ob_get_clean();
 
-                    $output_str .= $tmp_row;
+                    $outputstr .= $tmprow;
                 }
             }
         }
 
-        //$output_str .= $qtable->finish_output(!$this->table->is_downloading());
-        $output_str .= ".</table>";   //I tried having ob_start(); at the beginning of  the function, but that
-                                      //wouldnot get me the title of the pages
-                                      //This hackis here, because the line above seems to be causing some extra lines at the start of the html document
-
-        //var_dump($output_str);
-        return $output_str;
+        $outputstr .= ".</table>";   // I tried having ob_start(); at the beginning of  the function, but that
+                                     // wouldnot get me the title of the pages.
+                                     // This hack is here, because the line above seems to be causing some extra
+                                     // lines at the start of the html document.
+        return $outputstr;
     }
 
 
