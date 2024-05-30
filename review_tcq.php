@@ -72,18 +72,18 @@ if (!empty($cmid) && $attemptobj->get_cmid() != $cmid) {
 require_login($attemptobj->get_course(), false, $attemptobj->get_cm());
 $attemptobj->check_review_capability();
 
-//make sure that the user is accessing a tcq session -- resend them to the start page otherwise
-if (!$tcquizsession = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid))){
-  throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
+// Make sure that the user is accessing a tcq session -- resend them to the start page otherwise.
+if (!$tcquizsession = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid])) {
+    throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
-//The state of the tcquiz should be TCQUIZ_STATUS_SHOWRESULTS = 30 defined in locallib.php
-if ($tcquizsession->status != TCQUIZ_STATUS_SHOWRESULTS){
-  throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
+// The state of the tcquiz should be TCQUIZ_STATUS_SHOWRESULTS = 30 defined in locallib.php.
+if ($tcquizsession->status != TCQUIZ_STATUS_SHOWRESULTS) {
+    throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
-//if they are trying to access a different page than what the DB is allowing
-if ($tcquizsession->currentpage != $page){
-  throw new moodle_exception('notcurrentpage', 'quizaccess_tcquiz', $attemptobj->view_url());
+// If they are trying to access a different page than what the DB is allowing.
+if ($tcquizsession->currentpage != $page) {
+    throw new moodle_exception('notcurrentpage', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
 $attemptobj->preload_all_attempt_step_users();
@@ -100,7 +100,7 @@ $options = $attemptobj->get_display_options(true);
 if ($attemptobj->is_own_attempt()) {
 
     if (!$options->attempt) {
-        $accessmanager->back_to_view_page($PAGE->get_renderer('quizaccess_tcquiz'),$attemptobj->cannot_review_message());
+        $accessmanager->back_to_view_page($PAGE->get_renderer('quizaccess_tcquiz'), $attemptobj->cannot_review_message());
     }
 
 } else if (!$attemptobj->is_review_allowed()) {
@@ -112,7 +112,6 @@ if ($options->flags == question_display_options::EDITABLE && optional_param('sav
         PARAM_BOOL)) {
     require_sesskey();
     $attemptobj->save_question_flags();
-    //redirect($attemptobj->review_url(null, $page, $showall));
 }
 
 // Work out appropriate title and whether blocks should be shown.

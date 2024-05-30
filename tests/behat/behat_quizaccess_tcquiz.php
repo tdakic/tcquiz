@@ -17,9 +17,9 @@
 /**
  * Steps definitions related to mod_quiz.
  *
- * @package   mod_quiz
+ * @package   quizaccess_tcquiz
  * @category  test
- * @copyright 2014 Marina Glancy
+ * @copyright 2024 Tamara Dakic @ Capilano University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -43,12 +43,11 @@ use mod_quiz\quiz_settings;
 class behat_quizaccess_tcquiz extends behat_base {
 
     /**
+     * Wait for the page to be loaded
+     *
      * @When /^I wait for the page to be loaded$/
      */
-    public function i_wait_for_the_page_to_be_loaded()
-    {
-        //$xml = $this->getSession()->getDriver()->getContent();
-        //var_dump($xml);
+    public function i_wait_for_the_page_to_be_loaded() {
         $xml = file_get_contents($this->getSession()->getCurrentUrl());
         $this->getSession()->wait(10000, "document.readyState === 'complete'");
     }

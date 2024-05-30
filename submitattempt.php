@@ -67,18 +67,18 @@ if ($attemptobj->get_userid() != $USER->id) {
 if (!$attemptobj->is_preview_user()) {
     $attemptobj->require_capability('mod/quiz:attempt');
 }
-//make sure that the quiz is set up as a tcquiz
-if (!$tcq = $DB->get_record('quizaccess_tcquiz', array('quizid' => $quizid))){
-  throw new moodle_exception('nottcquiz', 'quizaccess_tcquiz', $attemptobj->view_url());
+// Make sure that the quiz is set up as a tcquiz.
+if (!$tcq = $DB->get_record('quizaccess_tcquiz', ['quizid' => $quizid])) {
+    throw new moodle_exception('nottcquiz', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
-//make sure that the user has the right sessionid
-if (!$tcquizsession = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid))){
-  throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
+// Make sure that the user has the right sessionid.
+if (!$tcquizsession = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid])) {
+    throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
-//if the state of the quiz is different than TCQUIZ_STATUS_FINALRESULTS  defined in locallib.php
-//they shouldn't be submitting the quiz
-if ($tcquizsession->status != TCQUIZ_STATUS_FINALRESULTS){
-  throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
+// If the state of the quiz is different than TCQUIZ_STATUS_FINALRESULTS  defined in locallib.php
+// they shouldn't be submitting the quiz.
+if ($tcquizsession->status != TCQUIZ_STATUS_FINALRESULTS) {
+    throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
 // Set up auto-save if required.
@@ -91,4 +91,3 @@ $attemptobj->process_auto_save($timenow);
 
 // Process the attempt, getting the FINISHED status for the attempt.
 $attemptobj->process_finish_tcq($timenow);
-//return 1;

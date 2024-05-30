@@ -44,24 +44,25 @@ require_sesskey();
 $context = $quizobj->get_context();
 require_capability('mod/quiz:manage', $context);
 
-if (!$session = $DB->get_record('quizaccess_tcquiz_session', array('quizid' => $quizid,'id' => $sessionid))){
-  throw new moodle_exception('nosession', 'quizaccess_tcquiz', $quizobj->view_url());
+if (!$session = $DB->get_record('quizaccess_tcquiz_session', ['quizid' => $quizid, 'id' => $sessionid])) {
+    throw new moodle_exception('nosession', 'quizaccess_tcquiz', $quizobj->view_url());
 }
-//make sure that the user is the owner of the session
-if (!$quizobj->is_preview_user() || $session->teacherid != $USER->id){
-      throw new moodle_exception('notyoursession', 'quizaccess_tcquiz', $quizobj->view_url());
+// Make sure that the user is the owner of the session.
+if (!$quizobj->is_preview_user() || $session->teacherid != $USER->id) {
+    throw new moodle_exception('notyoursession', 'quizaccess_tcquiz', $quizobj->view_url());
 }
 
 $PAGE->set_cacheable(false);
 $PAGE->set_title($SITE->fullname);
-$url = htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_students.php',['sessionid'=>$sessionid, 'attemptid' => $attemptid, 'cmid' => $cmid, 'quizid' => $quizid ]));
+$url = htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_students.php',
+  ['sessionid' => $sessionid, 'attemptid' => $attemptid, 'cmid' => $cmid, 'quizid' => $quizid ]), ENT_NOQUOTES);
 $PAGE->set_url($url);
 
 $output = $PAGE->get_renderer('mod_quiz');
 echo $output->header();
 
-$POLLING_INTERVAL = get_config('quizaccess_tcquiz', 'pollinginterval');
-echo $output->render_from_template('quizaccess_tcquiz/wait_for_students', ['sessionid'=>$sessionid, 'quizid'=>$quizid, 'cmid'=>$cmid,
-  'attemptid'=>$attemptid, 'POLLING_INTERVAL'=>$POLLING_INTERVAL]);
+$pollinginterval = get_config('quizaccess_tcquiz', 'pollinginterval');
+echo $output->render_from_template('quizaccess_tcquiz/wait_for_students', ['sessionid' => $sessionid,
+  'quizid' => $quizid, 'cmid' => $cmid, 'attemptid' => $attemptid, 'POLLING_INTERVAL' => $pollinginterval]);
 
 echo $output->footer();
