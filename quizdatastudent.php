@@ -35,7 +35,6 @@ require_once($CFG->libdir.'/filelib.php');
 require_login();
 require_sesskey();
 
-//$requesttype = optional_param('requesttype', '', PARAM_ALPHA); //useful for testing
 $quizid = required_param('quizid', PARAM_INT);
 $attempt = required_param('attempt', PARAM_INT );
 $cmid = required_param('cmid', PARAM_INT);
@@ -77,67 +76,66 @@ if (!has_capability('mod/quiz:attempt', $context)) {
     die();
 }
 */
-if (!$tcquiz = $DB->get_record('quizaccess_tcquiz_session', array('id' => $sessionid))){
-  tcquiz_send_error("TCQuiz Session incorrect");
-  tcquiz_end_response();
-  die();
+if (!$tcquiz = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid])) {
+    tcquiz_send_error("TCQuiz Session incorrect");
+    tcquiz_end_response();
+    die();
 }
 
 $status = $tcquiz->status;
 
 if ($status === false) {
     tcquiz_send_error(get_string('badquizid', 'tcquiz').$quizid);
-}
-else {
-      switch ($status) {
+} else {
+    switch ($status) {
 
-          case TCQUIZ_STATUS_FINISHED:
+        case TCQUIZ_STATUS_FINISHED:
 
-          case TCQUIZ_STATUS_NOTRUNNING:   // Quiz is not running.
-              tcquiz_send_not_running(); // We don't care what they asked for.
-              break;
+        case TCQUIZ_STATUS_NOTRUNNING:   // Quiz is not running.
+            tcquiz_send_not_running(); // We don't care what they asked for.
+            break;
 
-          case TCQUIZ_STATUS_READYTOSTART: // Quiz is ready to start.
-              tcquiz_send_await_question();
-              break;
+        case TCQUIZ_STATUS_READYTOSTART: // Quiz is ready to start.
+            tcquiz_send_await_question();
+            break;
 
-          case TCQUIZ_STATUS_PREVIEWQUESTION: // Previewing question (not used, but maybe useful later).
-              //break;
+        case TCQUIZ_STATUS_PREVIEWQUESTION: // Previewing question (not used, but maybe useful later).
 
-          case TCQUIZ_STATUS_SHOWQUESTION: // Question being displayed.
+        case TCQUIZ_STATUS_SHOWQUESTION: // Question being displayed.
 
-              echo '<status>showquestion</status>';
-              echo '<url>';
-              echo new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php',['page' => $tcquiz->currentpage, 'showall' => false, 'attempt' => $attempt,
-                'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id, 'sesskey' => sesskey() ]);
-              echo '</url>';
-              break;
-
-          case TCQUIZ_STATUS_SHOWRESULTS: // Results being displayed.
-
-            echo '<status>showresults</status>';
+            echo '<status>showquestion</status>';
             echo '<url>';
-            echo new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',['page' => $tcquiz->currentpage, 'showall' => 'false', 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid,
-                                'sessionid' => $tcquiz->id, 'sesskey' => sesskey() ]);
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php', ['page' => $tcquiz->currentpage, 'showall' => false,
+              'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id, 'sesskey' => sesskey() ]);
             echo '</url>';
             break;
 
-          case TCQUIZ_STATUS_FINALRESULTS: // Showing the final totals, etc.
+        case TCQUIZ_STATUS_SHOWRESULTS: // Results being displayed.
 
-            //submit the attempt first
+            echo '<status>showresults</status>';
+            echo '<url>';
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php', ['page' => $tcquiz->currentpage, 'showall' => 'false',
+              'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id, 'sesskey' => sesskey() ]);
+            echo '</url>';
+            break;
+
+        case TCQUIZ_STATUS_FINALRESULTS: // Showing the final totals, etc.
+
+            // Submit the attempt first.
             include($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/submitattempt.php');
 
             echo '<status>finalresults</status>';
             echo '<url>';
-            echo new moodle_url('/mod/quiz/accessrule/tcquiz/report_student_final_results.php',['attemptid' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'tcqsid' => $sessionid ]);
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/report_student_final_results.php', ['attemptid' => $attempt,
+              'quizid' => $quizid, 'cmid' => $cmid, 'tcqsid' => $sessionid ]);
             echo '</url>';
             break;
 
-          default:
+        default:
             echo '<status>error</status>';
             tcquiz_send_error(get_string('incorrectstatus', 'tcquiz').$status.'\'');
             break;
-        }
     }
+}
 
 tcquiz_end_response();

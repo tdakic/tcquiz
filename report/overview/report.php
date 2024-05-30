@@ -14,13 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * This file defines the quiz overview report class.
- *
- * @package   quiz_overview
- * @copyright 1999 onwards Martin Dougiamas and others {@link http://moodle.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 
 use mod_quiz\local\reports\attempts_report;
 use mod_quiz\question\bank\qbank_helper;
@@ -43,10 +36,15 @@ require_once($CFG->dirroot . '/mod/quiz/report/overview/report.php');
  * @copyright 2024 Tamara Dakic @ Capilano University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class tcquiz_overview_report extends quiz_overview_report {
 
-    /* displays the final graph with the grades from the requested tcq session only */
+    /**
+     * displays the final graph with the grades from the requested tcq session only
+     * @ param stdClass $quiz - the quiz
+     * @ param stdClass $cm - the course module being of the quiz
+     * @ param stdClass $course - the course that contains the quiz
+     * @ param int $sessionid - the id of a tcqsession
+     */
     public function tcq_display_final_graph($quiz, $cm, $course, $sessionid) {
         global $DB, $PAGE;
 
@@ -96,8 +94,6 @@ class tcquiz_overview_report extends quiz_overview_report {
             $hasstudents = $DB->record_exists_sql($sql, $studentsjoins->params);
         }
 
-
-
         if ($options->attempts == self::ALL_WITH) {
             // This option is only available to users who can access all groups in
             // groups mode, so setting allowed to empty (which means all quiz attempts
@@ -115,9 +111,7 @@ class tcquiz_overview_report extends quiz_overview_report {
         $this->print_standard_header_and_messages($cm, $course, $quiz,
                     $options, $currentgroup, $hasquestions, $hasstudents);
 
-
         $hasstudents = $hasstudents && (!$currentgroup || $this->hasgroupstudents);
-
 
         if (!$table->is_downloading() && $options->usercanseegrades) {
             $output = $PAGE->get_renderer('mod_quiz');
@@ -130,7 +124,6 @@ class tcquiz_overview_report extends quiz_overview_report {
                           JOIN {user} u on u.id = qg.userid
                         {$groupstudentsjoins->joins}
                           WHERE qg.quiz = $quiz->id AND {$groupstudentsjoins->wheres}";
-
 
                 if ($DB->record_exists_sql($sql, $groupstudentsjoins->params)) {
                     $data = quiz_report_grade_bands($bandwidth, $bands, $quiz->id, $groupstudentsjoins);
@@ -153,27 +146,24 @@ class tcquiz_overview_report extends quiz_overview_report {
                                 LEFT JOIN {quizaccess_tcquiz_attempt} qta ON qa.id = qta.attemptid
                                 WHERE qta.sessionid =:sessionid AND qa.preview = 0";
 
-                $grades_to_plot = $DB->get_records_sql($sql, array('sessionid'=>$sessionid));
+                $gradestoplot = $DB->get_records_sql($sql, ['sessionid' => $sessionid]);
 
                 $multiplier = $quiz->sumgrades;
-                $multiplier = floatval($quiz->grade)/floatval($quiz->sumgrades);
+                $multiplier = floatval($quiz->grade) / floatval($quiz->sumgrades);
 
                 $frequencies = array_fill(0, $bands, 0);
 
-                foreach ($grades_to_plot as $grade){
+                foreach ($gradestoplot as $grade) {
 
-                  if (!is_null($grade->sumgrades)){
+                    if (!is_null($grade->sumgrades)) {
 
-                    $index = floor(floatval($grade->sumgrades) * $multiplier / $bandwidth);
-                    if ($index == $bands){
-                      $index--;
+                        $index = floor(floatval($grade->sumgrades) * $multiplier / $bandwidth);
+                        if ($index == $bands) {
+                            $index--;
+                        }
+                        $frequencies[$index]++;
+
                     }
-                    $frequencies[$index]++;
-
-                  }
-                  else {
-                    //echo "NULL grade";
-                  }
 
                 }
 
@@ -181,10 +171,7 @@ class tcquiz_overview_report extends quiz_overview_report {
                 $graphname = get_string('overviewreportgraph', 'quiz_overview');
                 echo $output->chart($chart, $graphname, ['dir' => 'ltr']);
             }
-
-
         }
         return true;
     }
-
 }

@@ -41,88 +41,86 @@ class rule_test extends \advanced_testcase {
         $cm = new stdClass();
         $cm->id = 0;
         $quizobj = new \quizaccess_tcquiz_quiz_settings_class_alias($quiz, $cm, null);
-        //by default tcquiz is not required
+        // By default tcquiz is not required.
         $rule = quizaccess_tcquiz::make($quizobj, 0, false);
         $this->assertNull($rule);
 
-        //quiz set up as tcquiz
+        // Quiz set up as tcquiz.
         $quiz->tcquizrequired = true;
         $rule = quizaccess_tcquiz::make($quizobj, 0, false);
         $this->assertInstanceOf('quizaccess_tcquiz', $rule);
-        $this->assertEquals($rule->prevent_access(),get_string('accesserror', 'quizaccess_tcquiz'));
+        $this->assertEquals($rule->prevent_access(), get_string('accesserror', 'quizaccess_tcquiz'));
 
     }
 
     public function test_tcquiz_description_student() {
 
-      $this->resetAfterTest(true);
+        $this->resetAfterTest(true);
 
-      // Make a user to do the quiz.
-      $user = $this->getDataGenerator()->create_user();
-      $course = $this->getDataGenerator()->create_course();
-      // Make a quiz.
-      $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
-      $quiz = $quizgenerator->create_instance(['course' => $course->id,
-          'grade' => 100.0, 'navmethod' => QUIZ_NAVMETHOD_FREE, 'tcquizrequired' => true, 'questiontime'=>60]);
-      //$quiz->tcquizrequired = true;
+        // Make a user to do the quiz.
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        // Make a quiz.
+        $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
+        $quiz = $quizgenerator->create_instance(['course' => $course->id,
+            'grade' => 100.0, 'navmethod' => QUIZ_NAVMETHOD_FREE, 'tcquizrequired' => true, 'questiontime' => 60]);
 
-      $quizobj = \quizaccess_tcquiz_quiz_settings_class_alias::create($quiz->id, $user->id);
-      //by default tcquiz is not required
-      $rule = quizaccess_tcquiz::make($quizobj, 0, false);
-      // no questions in the quiz yet
-      $this->assertEquals($rule->description()[0],get_string('configuredastcq', 'quizaccess_tcquiz'));
+        $quizobj = \quizaccess_tcquiz_quiz_settings_class_alias::create($quiz->id, $user->id);
+        // By default tcquiz is not required.
+        $rule = quizaccess_tcquiz::make($quizobj, 0, false);
+        // No questions in the quiz yet.
+        $this->assertEquals($rule->description()[0], get_string('configuredastcq', 'quizaccess_tcquiz'));
 
-      //add a question
-      $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-      $cat = $questiongenerator->create_question_category();
-      $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
-      quiz_add_quiz_question($question->id, $quiz, 0);
+        // Add a question.
+        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $cat = $questiongenerator->create_question_category();
+        $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
+        quiz_add_quiz_question($question->id, $quiz, 0);
 
-      $rule_desc = $rule->description()[0];
-      $this->assertStringContainsString(get_string('joininstruct','quizaccess_tcquiz'), $rule_desc);
-      //the button was rendered too
-      $this->assertStringContainsString('id="fitem_id_join_session_button"',$rule_desc);
-      //and the input field - use regex? instead
-      $this->assertStringContainsString('id="id_joincode"',$rule_desc);
+        $ruledesc = $rule->description()[0];
+        $this->assertStringContainsString(get_string('joininstruct', 'quizaccess_tcquiz'), $ruledesc);
+        // The button was rendered too.
+        $this->assertStringContainsString('id="fitem_id_join_session_button"', $ruledesc);
+        // And the input field - use regex instead?
+        $this->assertStringContainsString('id="id_joincode"', $ruledesc);
 
     }
 
     public function test_tcquiz_description_teacher() {
 
-      $this->resetAfterTest(true);
+        $this->resetAfterTest(true);
 
-      // Make a user to do the quiz.
-      $user = $this->getDataGenerator()->create_user();
-      $course = $this->getDataGenerator()->create_course();
-      // Make a quiz.
-      $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
-      $quiz = $quizgenerator->create_instance(['course' => $course->id,
-          'grade' => 100.0, 'navmethod' => QUIZ_NAVMETHOD_FREE, 'tcquizrequired' => true, 'questiontime'=>60]);
-      //$quiz->tcquizrequired = true;
+        // Make a user to do the quiz.
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        // Make a quiz.
+        $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
+        $quiz = $quizgenerator->create_instance(['course' => $course->id,
+            'grade' => 100.0, 'navmethod' => QUIZ_NAVMETHOD_FREE, 'tcquizrequired' => true, 'questiontime' => 60]);
 
-      $quizobj = \quizaccess_tcquiz_quiz_settings_class_alias::create($quiz->id, $user->id);
-      //by default tcquiz is not required
-      $rule = quizaccess_tcquiz::make($quizobj, 0, false);
-      // no questions in the quiz yet
-      $this->assertEquals($rule->description()[0],get_string('configuredastcq', 'quizaccess_tcquiz'));
+        $quizobj = \quizaccess_tcquiz_quiz_settings_class_alias::create($quiz->id, $user->id);
+        // By default tcquiz is not required.
+        $rule = quizaccess_tcquiz::make($quizobj, 0, false);
+        // No questions in the quiz yet.
+        $this->assertEquals($rule->description()[0], get_string('configuredastcq', 'quizaccess_tcquiz'));
 
-      //add a question
-      $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-      $cat = $questiongenerator->create_question_category();
-      $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
-      quiz_add_quiz_question($question->id, $quiz, 0);
+        // Add a question.
+        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $cat = $questiongenerator->create_question_category();
+        $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
+        quiz_add_quiz_question($question->id, $quiz, 0);
 
-      //now test the teacher's view
-      $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
-      //login as teacher
-      $this->setUser($teacher);
+        // Now test the teacher's view.
+        $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
+        // Login as teacher.
+        $this->setUser($teacher);
 
-      $rule_desc = $rule->description()[0];
-      $this->assertStringContainsString(get_string('teacherstartnewinstruct','quizaccess_tcquiz'), $rule_desc );
-      //the button was rendered too
-      $this->assertStringContainsString('id="id_start_new_session_button"', $rule_desc );
-      //and the input field - use regex? instead
-      $this->assertStringContainsString('id="id_joincode"',$rule_desc );
+        $ruledesc = $rule->description()[0];
+        $this->assertStringContainsString(get_string('teacherstartnewinstruct', 'quizaccess_tcquiz'), $ruledesc );
+        // The button was rendered too.
+        $this->assertStringContainsString('id="id_start_new_session_button"', $ruledesc );
+        // And the input field - use regex instead?
+        $this->assertStringContainsString('id="id_joincode"', $ruledesc );
 
     }
 
