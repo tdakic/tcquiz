@@ -32,27 +32,27 @@ Feature: Test that the teacher can control a flow of a TCQuiz
   @javascript
   Scenario: Teacher creates a TCQuiz, starts it and displays the first question. The student joins the quiz
   and should see the first question.
-  # The above background doesn't seem to set the quiz to be a TCQuiz
-  When I am on the "Quiz 1" "quiz activity editing" page logged in as "teacher"
-  And I expand all fieldsets
-  And I set the field "Administer TCQuiz" to "Yes"
-  And I click on "Save and display" "button"
-  And I am on the "Quiz 1" "mod_quiz > View" page logged in as "teacher"
-  Then I should see "Start new quiz session"
-  And I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "teachercode4"
-  When I click on "Start new quiz session" "button"
-  Then I should see "Waiting for students to connect"
-  And I click on "Next >>" "button"
-  #When I wait for the page to be loaded
-  Then I should see "Text of the first question"
-  When I log out
-  And I am on the "Quiz 1" "mod_quiz > View" page logged in as "student"
-  Then I should see "Wait until your teacher gives you the code."
-  And "Join quiz" "button" should be visible
-  And I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "teachercode4"
-  When I click on "Join quiz" "button"
-  #When I wait for the page to be loaded
-  Then I should see "Text of the first question"
-  #And I click on "True" "radio" in the "TF1" "question"
-  #And I click on "Submit" "button"
-  #Then I should see "Question done - waiting for results."
+    # The above background doesn't seem to set the quiz to be a TCQuiz
+    When I am on the "Quiz 1" "quiz activity editing" page logged in as "teacher"
+    And I expand all fieldsets
+    And I set the field "Administer TCQuiz" to "Yes"
+    And I click on "Save and display" "button"
+    And I am on the "Quiz 1" "mod_quiz > View" page logged in as "teacher"
+    Then I should see "Start new quiz session"
+    And I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "teachercode4"
+    When I click on "Start new quiz session" "button"
+    Then I should see "Waiting for students to connect"
+    And I click on "Next >>" "button"
+    #When I wait for the page to be loaded
+    Then I should see "Text of the first question"
+    When I log out
+    And I am on the "Quiz 1" "mod_quiz > View" page logged in as "student"
+    Then I should see "Wait until your teacher gives you the code."
+    And "Join quiz" "button" should be visible
+    And I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "teachercode4"
+    When I click on "Join quiz" "button"
+    #When I wait for the page to be loaded
+    Then I should see "Text of the first question"
+    #And I click on "True" "radio" in the "TF1" "question"
+    #And I click on "Submit" "button"
+    #Then I should see "Question done - waiting for results."
