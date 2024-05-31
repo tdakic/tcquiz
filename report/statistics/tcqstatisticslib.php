@@ -28,7 +28,7 @@ use mod_quiz\quiz_attempt;
  * SQL to fetch relevant 'tcquiquizz_attempts' records.
  *
  * @param int    $tcquizid        tcquiz id to get attempts for
- * @param int    $sessiond        id of the current session of tcquiz
+ * @param int    $sessionid       id of the current session of tcquiz
  * @param \core\dml\sql_join $groupstudentsjoins Contains joins, wheres, params, empty if not using groups
  * @param string $whichattempts which attempts to use, represented internally as one of the constants as used in
  *                                   $tcquiquizz->grademethod ie.
@@ -70,17 +70,17 @@ function tcquiz_statistics_attempts_sql($tcquizid, $sessionid, \core\dml\sql_joi
 }
 
 /**
- * Return a {@link qubaid_condition} from the values returned by {@link tcquiz_statistics_attempts_sql}.
+ * Return a {qubaid_condition} from the values returned by {tcquiz_statistics_attempts_sql}.
  *
  * @param int    $tcquizid        the id of tcquiz
- * @param int    $sessiond        id of the current session of tcquiz
+ * @param int    $sessionid        id of the current session of tcquiz
  * @param \core\dml\sql_join $groupstudentsjoins Contains joins, wheres, params
  * @param string $whichattempts which attempts to use, represented internally as one of the constants as used in
  *                                   $tcquiz->grademethod ie.
  *                                   QUIZ_GRADEAVERAGE, QUIZ_GRADEHIGHEST, QUIZ_ATTEMPTLAST or QUIZ_ATTEMPTFIRST
  *                                   we calculate stats based on which attempts would affect the grade for each student.
  * @param bool    $includeungraded
- * @return        \qubaid_join
+ * @return        qubaid_join statistics_qubaids_condition
  */
 function tcquiz_statistics_qubaids_condition($tcquizid, $sessionid, \core\dml\sql_join $groupstudentsjoins,
                                              $whichattempts = QUIZ_ATTEMPTLAST , $includeungraded = true) {

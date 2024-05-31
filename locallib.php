@@ -71,7 +71,7 @@ function tcquiz_send_error($msg) {
 /**
  * Count the number of students connected
  * @param int $quizid the id of the quiz that is being administered as tcquiz
- * @param in $sessionid the session id of the current tcq session
+ * @param int $sessionid the session id of the current tcq session
  */
 function tcquiz_number_students($quizid, $sessionid) {
 
@@ -147,9 +147,9 @@ function tcquiz_get_final_results($sessionid, $cmid, $quizid) {
 /**
  * Counts the number of submitted student answers for a question.
  *
- * @param int $sessionid the session id of the current tcq session
+ * @param int $sessoinid the session id of the current tcq session
  * @param int $slot the slot for which we are counting the number of submitted answers
- * @return int the number of submitted answers for the given session of the tcquiz and the given slot
+ * @return xml with the number of submitted answers for the given session of the tcquiz and the given slot
  */
 function tcquiz_get_number_of_answers($sessoinid, $slot) {
     global $DB;
@@ -292,6 +292,8 @@ function create_new_tcq_session($joincode, $quiz) {
 
 /**
  * Add the requesttype to xml - good for debuging.
+ * @param string $requesttype - current requestype
+ * @return xml that contains the requesttype
  */
 function add_requesttype($requesttype) {
     echo "<requesttype>";

@@ -73,7 +73,7 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
      * Return an appropriately configured instance of this rule, if it is applicable
      * to the given quiz, otherwise return null.
      *
-     * @param quiz_settings $quizobj information about the quiz in question.
+     * @param quizaccess_tcquiz_quiz_settings_class_alias $quizobj information about the quiz in question.
      * @param int $timenow the time that should be considered as 'now'.
      * @param bool $canignoretimelimits whether the current user is exempt from
      *      time limits by the mod/quiz:ignoretimelimits capability.

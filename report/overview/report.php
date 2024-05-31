@@ -40,10 +40,10 @@ class tcquiz_overview_report extends quiz_overview_report {
 
     /**
      * displays the final graph with the grades from the requested tcq session only
-     * @ param stdClass $quiz - the quiz
-     * @ param stdClass $cm - the course module being of the quiz
-     * @ param stdClass $course - the course that contains the quiz
-     * @ param int $sessionid - the id of a tcqsession
+     * @param stdClass $quiz - the quiz
+     * @param stdClass $cm - the course module being of the quiz
+     * @param stdClass $course - the course that contains the quiz
+     * @param int $sessionid - the id of a tcqsession
      */
     public function tcq_display_final_graph($quiz, $cm, $course, $sessionid) {
         global $DB, $PAGE;

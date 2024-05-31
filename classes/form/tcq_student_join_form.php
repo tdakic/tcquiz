@@ -57,8 +57,8 @@ class tcq_student_join_form extends moodleform {
 
     /**
      * Custom validation of the joincode field
-     * @param $data submited data
-     * @param $files not used
+     * @param array $data submited data
+     * @param file $files not used
      */
     public function validation($data, $files) {
 
