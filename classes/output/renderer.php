@@ -233,6 +233,8 @@ class renderer extends \mod_quiz\output\renderer {
      * @param int $page the current page number
      * @param bool $showall whether to show entire attempt on one page.
      * @param display_options $displayoptions instance of display_options.
+     * @param int $sessionid the id of the current session
+     * @param string $sesskey the sesskey of the current session
      * @return string HTML to display.
      */
     public function tcq_review_page($attemptobj, $slots, $page, $showall,

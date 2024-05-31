@@ -128,10 +128,11 @@ function tcquiz_is_running($status) {
 
 /**
  * Gets the url of the script that displays the teacher's final results.
- * @param int $quizid the id of the quiz that is being administered as tcquiz
+ *
  * @param int $sessionid the session id of the current tcq session
  * @param int $cmid course module id of the current quiz
- * @return url of the script that displays the final results
+ * @param int $quizid the id of the quiz that is being administered as tcquiz
+ * @return xml with url of the script that displays the final results
  */
 function tcquiz_get_final_results($sessionid, $cmid, $quizid) {
     sleep(2); // So everyone has time to submit.
@@ -145,9 +146,10 @@ function tcquiz_get_final_results($sessionid, $cmid, $quizid) {
 
 /**
  * Counts the number of submitted student answers for a question.
+ *
  * @param int $sessionid the session id of the current tcq session
  * @param int $slot the slot for which we are counting the number of submitted answers
- * @return the number of submitted answers for the given session of the tcquiz and the given slot
+ * @return int the number of submitted answers for the given session of the tcquiz and the given slot
  */
 function tcquiz_get_number_of_answers($sessoinid, $slot) {
     global $DB;
@@ -164,10 +166,11 @@ function tcquiz_get_number_of_answers($sessoinid, $slot) {
 }
 
 /**
- * insert a new tcquiz_attempt into DB
+ * Insert a new tcquiz_attempt into DB
+ *
  * @param int $sessid the session id of the current tcq session
  * @param int $newattemptid the attempt id of the started attemp
- * @return the id of the new tcquiz_attempt
+ * @return int the id of the new tcquiz_attempt
  */
 function create_new_tcq_attempt($sessid, $newattemptid) {
 
@@ -182,13 +185,14 @@ function create_new_tcq_attempt($sessid, $newattemptid) {
 
 }
 /**
- * creates a new quiz attempt, new tcq teacher attempt and a new tcq session\
+ * creates a new quiz attempt, new tcq teacher attempt and a new tcq session.
+ *
  * @param quiz_settings $quizobj quiz object
  * @param alphanum $joincode the joincode for the session of tcquiz
- * @param int $attemptnumber the attempt number
  * @param stdClass $lastattempt last attempt object
+ * @param int $attemptnumber the attempt number
  * @param int $currentattemptid the id of the current quiz attempt
- * @return the id of the new quiz attempt and the id of the new tcq session
+ * @return array the id of the new quiz attempt and the id of the new tcq session
  */
 function validate_and_start_teacher_tcq_attempt($quizobj, $joincode, $lastattempt, $attemptnumber, $currentattemptid) {
     $quiz = $quizobj->get_quiz();
@@ -213,11 +217,12 @@ function validate_and_start_teacher_tcq_attempt($quizobj, $joincode, $lastattemp
  * PRE: $joincode is a code of running TCQ session
  * @param quiz_settings $quizobj quiz object
  * @param stdClass $session tcqsession object
+ * @param int $currentattemptid the id of the current quiz attempt
  * @param alphanum $joincode the joincode for the session of tcquiz
+ * @param access_manager $accessmanager accessmanager for this quiz
  * @param int $attemptnumber the attempt number
  * @param stdClass $lastattempt last attempt object
- * @param int $currentattemptid the id of the current quiz attempt
- * @return the id of the new quiz attempt and the id of the new tcq session
+ * @return int the id of the new quiz attempt and the id of the new tcq session
  */
 function setup_tcquiz_attempt($quizobj, $session, $currentattemptid, $joincode, $accessmanager, $attemptnumber, $lastattempt) {
 
@@ -255,9 +260,10 @@ function setup_tcquiz_attempt($quizobj, $session, $currentattemptid, $joincode, 
 
 /**
  * Insert a new tcquiz_session into DB.
- * @param int $sessid the session id of the current tcq session
+ *
+ * @param string $joincode the joinode of the current tcq session
  * @param stdClass $quiz standard moodle quiz
- * @return the id of the new tcq_session
+ * @return int the id of the new tcq_session
  */
 function create_new_tcq_session($joincode, $quiz) {
 

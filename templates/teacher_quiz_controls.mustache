@@ -24,14 +24,25 @@
 
     Example context (json):
     {
-      'sessionid'=>12345                    // current tcquiz sessionid
-      'quizid'=>12345,                      // quizid of this quiz
-      'cmid'=>12345,                        // cmid of this quiz
-      'attemptid'=>12345,                   // the attemptid of the teacher's preview
-      'page'=>1,                            // current tcquiz page
-      'time_for_question'=>30               // time students have for this question (in seconds)
-      'POLLING_INTERVAL'=>30,               // the frequency of polling from TCQ configuration
+      "sessionid": 12345,
+      "quizid": 12345,
+      "cmid": 12345,
+      "attemptid": 12345,
+      "page": 1,
+      "time_for_question": 30,
+      "POLLING_INTERVAL": 30
     }
+
+    where
+
+    "sessionid": 12345,                   // current tcquiz sessionid
+    "quizid": 12345,                      // quizid of this quiz
+    "cmid": 12345,                        // cmid of this quiz
+    "attemptid": 12345,                   // the attemptid of the student's attempt
+    "page": 1,                            // current tcquiz page
+    "time_for_question": 30,              // time students have for this question (in seconds)
+    "POLLING_INTERVAL": 30                // the frequency of polling from TCQ configuration
+
 }}
 
 <div 'id'='teachercontrols' 'class'='que formulation clearfix'>

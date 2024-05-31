@@ -22,12 +22,21 @@
 
     Example context (json):
     {
-      'sessionid'=>12345                    // current tcquiz sessionid
-      'quizid'=>12345,                      // quizid of this quiz
-      'cmid'=>12345,                        // cmid of this quiz
-      'attemptid'=>12345,                   // the attemptid of the student's attempt
-      'POLLING_INTERVAL'=>30,               // the frequency of polling from TCQ configuration
+      "sessionid": 12345,
+      "quizid": 12345,
+      "cmid": 12345,
+      "attemptid": 12345,
+      "POLLING_INTERVAL": 30
     }
+
+    where
+
+    "sessionid": 12345,                   // current tcquiz sessionid
+    "quizid": 12345,                      // quizid of this quiz
+    "cmid": 12345,                        // cmid of this quiz
+    "attemptid": 12345,                   // the attemptid of the student's attempt
+    "POLLING_INTERVAL": 30                // the frequency of polling from TCQ configuration
+
 }}
 
 <h1> {{#str}} waitfirst, quizaccess_tcquiz {{/str}} </h1>

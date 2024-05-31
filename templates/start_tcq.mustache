@@ -23,18 +23,31 @@
 
     Example context (json):
     {
-      'existingsession'=>true,              // true/false depending if a session of tcquiz is in progress (exists)
-      'sessionid'=>12345,                   // if 'existingsession' is true, the sessionid of the existingsession
-      'joincode'=>'samplecode',             // if 'existingsession' is true, the joincode of the existingsession  - likely not needed
-      'timestamp'=>timestamp,               // if 'existingsession' is true, the time the existingsession was started
-      'currentpage'=>1,                     // if 'existingsession' is true, the current quiz page of the existingsession
-      'status'=>10,                         // if 'existingsession' is true, the status of the existingsession defined in tcq_constants.json
-      'attemptid'=>12345,                   // if 'existingsession' is true, the attemptid of the teachger's preview
-      'quizid'=>12345,                      // quizid of this quiz
-      'cmid'=>12345                         // cmid of this quiz
-      'formhtml'=>formathtml                // rendered from /mod/quiz/accessrule/tcquiz/classes/form/tcq_start_form.php contains an input
-                                            // field for joincode and a submit button
+        "existingsession": true,
+        "sessionid": 12345,
+        "joincode": "samplecode",
+        "timestamp": "timestamp",
+        "currentpage": 1,
+        "status": 10,
+        "attemptid": 12345,
+        "quizid": 12345,
+        "cmid": 12345,
+        "formhtml": "formathtml"
     }
+
+    where
+
+    "existingsession": true,              // true/false depending if a session of tcquiz is in progress (exists)
+    "sessionid": 12345,                   // if "existingsession" is true, the sessionid of the existingsession
+    "joincode": "samplecode",             // if "existingsession" is true, the joincode of the existingsession  - likely not needed
+    "timestamp": timestamp,               // if "existingsession" is true, the time the existingsession was started
+    "currentpage": 1,                     // if "existingsession" is true, the current quiz page of the existingsession
+    "status": 10,                         // if "existingsession" is true, the status of the existingsession defined in tcq_constants.json
+    "attemptid": 12345,                   // if "existingsession" is true, the attemptid of the teachger"s preview
+    "quizid": 12345,                      // quizid of this quiz
+    "cmid": 12345,                        // cmid of this quiz
+    "formhtml": "formathtml"              // rendered from /mod/quiz/accessrule/tcquiz/classes/form/tcq_start_form.php contains an input
+                                          // field for joincode and a submit button
 }}
 
 <div id="starttcquizform">

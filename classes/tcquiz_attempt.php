@@ -188,9 +188,7 @@ class tcquiz_attempt extends quiz_attempt {
      * saved when this function is called
      *
      * @param int $timestamp the time to record as last modified time.
-     * @param bool $processsubmitted if true, and question responses in the current
-     *      POST request are stored to be graded, before the attempt is finished.
-     * @param ?int $timefinish if set, use this as the finish time for the attempt.
+     * @param int $timefinish if set, use this as the finish time for the attempt.
      *      (otherwise use $timestamp as the finish time as well).
      * @param bool $studentisonline is the student currently interacting with Moodle?
      */

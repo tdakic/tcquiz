@@ -249,6 +249,9 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
 
     /**
      * Currently not used - left in case we allow more than one open tcqsession per tcquiz
+     *
+     * @param context_module $context the quiz context.
+     * @return array of tcqsessions that are in progress for this quiz
      */
     private function get_open_sessions($context): array {
         global $DB;
@@ -297,7 +300,8 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
 
       /**
        * Return the list with information of the tcquiz session that is currently running
-        @return array('sessionid', 'joincode', 'timestamp', 'currentpage', 'status',  'attemptid');
+       * @param context_module $context the quiz context.
+       * @return array('sessionid', 'joincode', 'timestamp', 'currentpage', 'status',  'attemptid');
        */
     private function get_open_session($context): array {
 

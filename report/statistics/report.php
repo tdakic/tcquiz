@@ -221,6 +221,7 @@ class tcquiz_statistics_report extends quiz_statistics_report {
      * Get the tcqquiz and question statistics
      *
      * @param stdClass $quiz             the quiz settings.
+     * @param int $sessionid             tcquiz session id
      * @param string $whichattempts      which attempts to use, represented internally as one of the constants as used in
      *                                   $quiz->grademethod ie.
      *                                   QUIZ_GRADEAVERAGE, QUIZ_GRADEHIGHEST, QUIZ_ATTEMPTLAST or QUIZ_ATTEMPTFIRST
