@@ -21,18 +21,17 @@
     Template for a student tcquiz start page. Used in the description method
     method of the quizaccess_tcquiz class. (rule.php)
 
+    "quizid"   - quizid of this quiz
+    "cmid"     - cmid of this quiz
+    "formhtml" - rendered from /mod/quiz/accessrule/tcquiz/classes/form/tcq_student_join_form.php
+                  contains an input field for joincode and a submit button
+      
     Example context (json):
     {
       "quizid": 12345,
       "cmid": 12345,
       "formhtml": "formhtml"
     }
-
-    where
-      "quizid" is quizid of this quiz
-      "cmid" is cmid of this quiz
-      "formhtml" is rendered from /mod/quiz/accessrule/tcquiz/classes/form/tcq_student_join_form.php
-                    contains an input field for joincode and a submit button
 }}
 
 <div id="studentjointcquizform">

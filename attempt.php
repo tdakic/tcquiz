@@ -143,7 +143,6 @@ $PAGE->requires->js_init_call('M.mod_quiz.init_attempt_form', null, false, quiz_
 \core\session\manager::keepalive(); // Try to prevent sessions expiring during quiz attempts.
 
 $PAGE->set_title($attemptobj->attempt_page_title($page));
-$PAGE->add_body_class('limitedwidth');
 $PAGE->set_heading($attemptobj->get_course()->fullname);
 $PAGE->activityheader->disable();
 

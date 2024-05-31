@@ -20,6 +20,14 @@
 
     Template to add polling for the number of connected students after the teacher starts the quiz.
 
+    where
+
+    "sessionid": 12345,      - current tcquiz sessionid
+    "quizid": 12345,         - quizid of this quiz
+    "cmid": 12345,           - cmid of this quiz
+    "attemptid": 12345,      - the attemptid of the student's attempt
+    "POLLING_INTERVAL": 30   - the frequency of polling from TCQ configuration
+
     Example context (json):
     {
       "sessionid": 12345,
@@ -28,21 +36,13 @@
       "attemptid": 12345,
       "POLLING_INTERVAL": 30
     }
-
-    where
-
-    "sessionid": 12345,                   // current tcquiz sessionid
-    "quizid": 12345,                      // quizid of this quiz
-    "cmid": 12345,                        // cmid of this quiz
-    "attemptid": 12345,                   // the attemptid of the student's attempt
-    "POLLING_INTERVAL": 30                // the frequency of polling from TCQ configuration
 }}
 
 <h1> {{#str}} waitstudent, quizaccess_tcquiz {{/str}} </h1>
 
 <p> {{#str}} clicknext, quizaccess_tcquiz {{/str}} </p>
 
-<p> {{#str}} numconnectedstudents, quizaccess_tcquiz {{/str}} <span data-region="quizaccess_tcquiz/numberstudents_span">0 <span> <p>
+<p> {{#str}} numconnectedstudents, quizaccess_tcquiz {{/str}} <span data-region="quizaccess_tcquiz/numberstudents_span">0 </span> </p>
 
 <button class='btn btn-primary' data-action="quizaccess_tcquiz/waitforstudents-next_button">{{#str}} next, quizaccess_tcquiz {{/str}}</button>
 

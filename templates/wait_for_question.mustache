@@ -20,6 +20,13 @@
 
     Template to add polling for the release of the first quiz question once a student connected to the quiz.
 
+    "sessionid"         - current tcquiz sessionid
+    "quizid"            - quizid of this quiz
+    "cmid"              - cmid of this quiz
+    "attemptid"         - the attemptid of the student's attempt
+    "POLLING_INTERVAL"  - the frequency of polling from TCQ configuration
+
+
     Example context (json):
     {
       "sessionid": 12345,
@@ -29,18 +36,10 @@
       "POLLING_INTERVAL": 30
     }
 
-    where
-
-    "sessionid": 12345,                   // current tcquiz sessionid
-    "quizid": 12345,                      // quizid of this quiz
-    "cmid": 12345,                        // cmid of this quiz
-    "attemptid": 12345,                   // the attemptid of the student's attempt
-    "POLLING_INTERVAL": 30                // the frequency of polling from TCQ configuration
-
 }}
 
 <h1> {{#str}} waitfirst, quizaccess_tcquiz {{/str}} </h1>
 
 {{#js}}
-require(['quizaccess_tcquiz/waitforquestion'], (module) => module.init('{{sessionid}}' ,'{{quizid}}', '{{cmid}}', {{attemptid}}, {{POLLING_INTERVAL}}));
+require(['quizaccess_tcquiz/waitforquestion'], (module) => module.init('{{sessionid}}', '{{quizid}}', '{{cmid}}', {{attemptid}}, {{POLLING_INTERVAL}}));
 {{/js}}

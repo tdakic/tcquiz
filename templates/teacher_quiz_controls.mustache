@@ -21,6 +21,15 @@
     Template to add the End Question button to an attempt page. The template is used in the
     tcq_teacher_attempt_page method of tcquiz renderer class.
 
+    where
+
+    "sessionid"         - current tcquiz sessionid
+    "quizid"            - quizid of this quiz
+    "cmid"              - cmid of this quiz
+    "attemptid"         - the attemptid of the student's attempt
+    "page"              - current tcquiz page
+    "time_for_question" - time students have for this question (in seconds)
+    "POLLING_INTERVAL"  - the frequency of polling from TCQ configuration
 
     Example context (json):
     {
@@ -32,20 +41,9 @@
       "time_for_question": 30,
       "POLLING_INTERVAL": 30
     }
-
-    where
-
-    "sessionid": 12345,                   // current tcquiz sessionid
-    "quizid": 12345,                      // quizid of this quiz
-    "cmid": 12345,                        // cmid of this quiz
-    "attemptid": 12345,                   // the attemptid of the student's attempt
-    "page": 1,                            // current tcquiz page
-    "time_for_question": 30,              // time students have for this question (in seconds)
-    "POLLING_INTERVAL": 30                // the frequency of polling from TCQ configuration
-
 }}
 
-<div 'id'='teachercontrols' 'class'='que formulation clearfix'>
+<div id='teachercontrols' class='que formulation clearfix'>
   <p> {{#str}} numanswers, quizaccess_tcquiz {{/str}} <span data-region="quizaccess_tcquiz/numberanswers_span" id='numanswers'> 0 </span></p>
   <p> {{#str}} timeleft, quizaccess_tcquiz {{/str}} <span data-region="quizaccess_tcquiz/timeleft_span" id='timeleft'> {{time_for_question}}  </span></p>
   <p> <button class='btn btn-primary' data-action="quizaccess_tcquiz/end-question_button">{{#str}} endquestion, quizaccess_tcquiz {{/str}}</button> </p>
@@ -55,6 +53,6 @@
 </div>
 
 {{#js}}
-require(['quizaccess_tcquiz/teachercontrols'], (module) => module.init('{{sessionid}}','{{quizid}}', '{{cmid}}',
-{{attemptid}}, {{page}}, {{time_for_question}},{{POLLING_INTERVAL}}));
+require(['quizaccess_tcquiz/teachercontrols'], (module) => module.init('{{sessionid}}', '{{quizid}}', '{{cmid}}',
+{{attemptid}}, {{page}}, {{time_for_question}}, {{POLLING_INTERVAL}}));
 {{/js}}
