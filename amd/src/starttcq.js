@@ -42,7 +42,7 @@ const Selectors = {
 
 const registerEventListeners = (sessionid, joincode, timestamp, currentpage, status, attemptid, existingsession, quizid, cmid) => {
 
-  /*  window.addEventListener('load', function(){
+  /*  In 4.3 this works window.addEventListener('load', function(){
 
         $("#page-content").html($("#starttcquizform"),false);
 
@@ -51,83 +51,84 @@ const registerEventListeners = (sessionid, joincode, timestamp, currentpage, sta
 */
 
       if (document.readyState === "complete") {
-          $("#page-content").html($("#starttcquizform"),false);
+          $("#page-content").html($("#starttcquizform"), false);
       } else {
-        window.addEventListener('load', function(){
-            $("#page-content").html($("#starttcquizform"),false);
+          window.addEventListener('load', function() {
+            $("#page-content").html($("#starttcquizform"), false);
           });
       }
 
-    //handle the teacher clicking on the End button to end the session (if there is one)
+    // Handle the teacher clicking on the End button to end the session (if there is one).
     const endTCQAction = document.querySelector(Selectors.actions.endButton);
-    if (endTCQAction !== null){
+    if (endTCQAction !== null) {
       endTCQAction.addEventListener('click', async(e) => {
 
             e.preventDefault();
 
-            var url = M.cfg.wwwroot+"/mod/quiz/accessrule/tcquiz/end_session.php?id="+ e.target.name + "&cmid=" + cmid;
+            var url = M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/end_session.php?id=" + e.target.name + "&cmid=" + cmid;
 
-            //response.status will be 404 even if the fetched url throws exception
-            await fetch(url, {method: "POST",}).then((response) => {
+            // Response.status will be 404 even if the fetched url throws exception.
+            await fetch(url, {method: "POST"}).then((response) => {
                   if (!response.ok) {
                     Notification.addNotification({
                         message: getString('errorclosingsession', 'quizaccess_tcquiz'),
                         type: 'error'
                     });
-                  }
-                  else {
+
+                  } else {
                     location.reload();
                   }
           });
-      },{once: true});
+      }, {once: true});
     }
-    //handle the teacher clicking on the Rejoin button to rejoin the running session (if there is one)
+    // Handle the teacher clicking on the Rejoin button to rejoin the running session (if there is one).
     const rejoinTCQAction = document.querySelector(Selectors.actions.rejoinButton);
-    if (endTCQAction !== null){
+    if (endTCQAction !== null) {
       rejoinTCQAction.addEventListener('click', async(e) => {
             e.preventDefault();
-            //constants defined in tcq_constants.json - get them!
-            const response = await fetch(M.cfg.wwwroot+"/mod/quiz/accessrule/tcquiz/tcq_constants.json");
-            const tcq_consts = await response.json();
+            // Constants defined in tcq_constants.json - get them!
+            const response = await fetch(M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/tcq_constants.json");
+            const tcqConsts = await response.json();
 
             var url = "";
-            if (status == tcq_consts.TCQUIZ_STATUS_READYTOSTART){
-              url = M.cfg.wwwroot+"/mod/quiz/accessrule/tcquiz/wait_for_students.php?quizid="+ quizid + "&cmid=" + cmid +
-              "&attemptid=" + attemptid + "&joincode=" + joincode + "&sessionid=" + sessionid+"&sesskey="+ M.cfg.sesskey;
+            if (status == tcqConsts.TCQUIZ_STATUS_READYTOSTART) {
+              url = M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/wait_for_students.php?quizid=" + quizid + "&cmid=" + cmid +
+              "&attemptid=" + attemptid + "&joincode=" + joincode + "&sessionid=" + sessionid + "&sesskey=" + M.cfg.sesskey;
               window.location.replace(url);
-            }
-            else if (status == tcq_consts.TCQUIZ_STATUS_PREVIEWQUESTION || status == tcq_consts.TCQUIZ_STATUS_SHOWQUESTION){
-              url = M.cfg.wwwroot+"/mod/quiz/accessrule/tcquiz/attempt.php?showall=0&quizid="+ quizid + "&cmid=" + cmid +
+
+            } else if (status == tcqConsts.TCQUIZ_STATUS_PREVIEWQUESTION || status == tcqConsts.TCQUIZ_STATUS_SHOWQUESTION) {
+              url = M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/attempt.php?showall=0&quizid=" + quizid + "&cmid=" + cmid +
               "&attempt=" + attemptid + "&joincode" + joincode + "&sessionid=" + sessionid + "&page=" + currentpage +
-              "&sesskey="+ M.cfg.sesskey;
+              "&sesskey=" + M.cfg.sesskey;
               window.location.replace(url);
-            }
-            else if (status == tcq_consts.TCQUIZ_STATUS_SHOWRESULTS){
-              url = M.cfg.wwwroot+"/mod/quiz/accessrule/tcquiz/review_tcq.php?showall=false&quizid="+ quizid + "&cmid=" + cmid +
-              "&attempt=" + attemptid + "&joincode" + joincode + "&sessionid=" + sessionid + "&page=" + currentpage +
-              "&sesskey="+ M.cfg.sesskey;
+
+            } else if (status == tcqConsts.TCQUIZ_STATUS_SHOWRESULTS) {
+              url = M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/review_tcq.php?showall=false&quizid=" + quizid + "&cmid=" +
+              cmid + "&attempt=" + attemptid + "&joincode" + joincode + "&sessionid=" + sessionid + "&page=" + currentpage +
+              "&sesskey=" + M.cfg.sesskey;
               window.location.replace(url);
-            }
-            else if (status == tcq_consts.TCQUIZ_STATUS_FINALRESULTS){
-              url = M.cfg.wwwroot+"/mod/quiz/accessrule/tcquiz/report_final_results.php?mode=overview&quizid="+ quizid +
-              "&id=" + cmid + "&tcqsid=" + sessionid + "&sesskey="+ M.cfg.sesskey;
+
+            } else if (status == tcqConsts.TCQUIZ_STATUS_FINALRESULTS) {
+              url = M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/report_final_results.php?mode=overview&quizid=" + quizid +
+              "&id=" + cmid + "&tcqsid=" + sessionid + "&sesskey=" + M.cfg.sesskey;
               window.location.replace(url);
-            }
-            else{
+
+            } else {
               Notification.addNotification({
                   message: getString('errorrejoining', 'quizaccess_tcquiz'),
                   type: 'error'
               });
             }
-      },{once: true});
+      }, {once: true});
     }
 
 
-    //trying to prevent double clicking here
+    // Trying to prevent double clicking here.
     document.addEventListener('click', (e) => {
           if (e.target.closest(Selectors.actions.startTCQButton)) {
             e.preventDefault();
-    }},{once: true});
+          }
+    }, {once: true});
 
 };
 

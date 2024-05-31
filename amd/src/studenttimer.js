@@ -32,56 +32,43 @@ const Selectors = {
  },
 };
 
-const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, time_for_question, POLLING_INTERVAL) => {
-//the timer can be stoped either by the teacher or expired time -- handle both events
-//enough to check when the state of the quiz has changed to show results (30)
+const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL) => {
+// The timer can be stoped either by the teacher or expired time -- handle both events.
+// Enough to check when the state of the quiz has changed to show results (30)
 
-//the submit button is clickable twice causing problems
-//name="responseformsubmit" value="Submit" class="mod_quiz-next-nav btn btn-primary"
-//id="responseformsubmit" formaction="http://localhost/moodle/mod/quiz/accessrule/tcquiz/processattempt.php?
-
-    /*does nothing
-    $(document).ready(function(){
-       $("responseform").submit(function() {
-              $(this).submit(function() {
-                  return false;
-              });
-              return true;
-          });
-    });*/
-
-    $('#responseform').on('submit', function () {
+    $('#responseform').on('submit', function() {
         $('#responseformsubmit').attr('disabled', 'disabled');
     });
 
-    //this should prevent "Unsaved changes" pop-up which might happen if the student typed something
-    //but didn't click submit
-    window.addEventListener('beforeunload', function (event) {
+    // This should prevent "Unsaved changes" pop-up which might happen if the student typed something
+    // but didn't click submit.
+    window.addEventListener('beforeunload', function(event) {
       event.stopImmediatePropagation();
     });
 
-    var timeLeft = time_for_question; //+1 to wait for everyone?
-    var timeLeft_html = document.querySelector(Selectors.regions.timeLeft);
+    var timeLeft = timeForQuestion; // +1 to wait for everyone?
+    var timeLeftHTML = document.querySelector(Selectors.regions.timeLeft);
     var teacherEndedQuestion = false;
 
-    //timer
+    // Timer
     var timer = setInterval(function() {
         timeLeft--;
-        timeLeft_html.innerHTML = timeLeft;
-        if (timeLeft <= 0 || teacherEndedQuestion){
+        timeLeftHTML.innerHTML = timeLeft;
+        if (timeLeft <= 0 || teacherEndedQuestion) {
           clearInterval(timer);
           clearInterval(tecaherEndedQuestionEvent);
           timer = null;
-          timeLeft_html.innerHTML = 0;
-          window.goToCurrentQuizPageEvent = setInterval(async () =>
-            {await go_to_current_quiz_page(sessionid, quizid, cmid, attemptid);}, POLLING_INTERVAL);
+          timeLeftHTML.innerHTML = 0;
+          window.goToCurrentQuizPageEvent = setInterval(async() => {
+              await goToCurrentQuizPage(sessionid, quizid, cmid, attemptid);
+          }, POLLING_INTERVAL);
         }
     }, 1000);
 
-    //checks for teacher ending the question event
+    // Checks for teacher ending the question event.
     const tecaherEndedQuestionEvent = setInterval(async function() {
-      teacherEndedQuestion = await check_question_state(sessionid, quizid, cmid, attemptid);
-    }, POLLING_INTERVAL); //1000 means 1 sec, 5000 means 5 seconds
+      teacherEndedQuestion = await checkQuestionState(sessionid, quizid, cmid, attemptid);
+    }, POLLING_INTERVAL); // 1000 means 1 sec, 5000 means 5 seconds
 
 };
 
@@ -91,17 +78,17 @@ const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, time_f
  * @param {quizid} quizid The quizid of the current quiz.
  * @param {cmid} cmid Course module id of the current quiz.
  * @param {attemptid} attemptid The attemptid of the teacher's attempt.
- * @return true if the question was stopped by the teacher, false otherwise
+ * @return {boolean} - true if the question was stopped by the teacher, false otherwise
  */
-async function check_question_state(sessionid, quizid, cmid, attemptid) {
+async function checkQuestionState(sessionid, quizid, cmid, attemptid) {
 
-  var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/get_question_state.php?quizid='
-    +quizid+'&sessionid='+sessionid+'&cmid='+ cmid +'&attempt='+attemptid
-    +'&sesskey='+ M.cfg.sesskey,{method: 'POST'});
+  var result = await fetch(M.cfg.wwwroot + '/mod/quiz/accessrule/tcquiz/get_question_state.php?quizid='
+    + quizid + '&sessionid=' + sessionid + '&cmid=' + cmid + '&attempt=' + attemptid
+    + '&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
-  var response_xml_text = await result.text();
+  var responseXMLText = await result.text();
 
-  return response_xml_text == "0";
+  return responseXMLText == "0";
 
 }
 
@@ -113,32 +100,32 @@ async function check_question_state(sessionid, quizid, cmid, attemptid) {
  * @param {quizid} quizid The quizid of the current quiz.
  * @param {cmid} cmid Course module id of the current quiz.
  * @param {attemptid} attemptid The attemptid of the teacher's attempt.
-*/
-async function go_to_current_quiz_page(sessionid, quizid, cmid, attemptid) {
+ */
+async function goToCurrentQuizPage(sessionid, quizid, cmid, attemptid) {
 
-  var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatastudent.php?quizid='
-    +quizid+'&sessionid='+sessionid+'&cmid='+ cmid +'&attempt='+attemptid
-    +'&sesskey='+ M.cfg.sesskey,{method: 'POST'});
+  var result = await fetch(M.cfg.wwwroot + '/mod/quiz/accessrule/tcquiz/quizdatastudent.php?quizid='
+    + quizid + '&sessionid=' + sessionid + '&cmid=' + cmid + '&attempt=' + attemptid
+    + '&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
-  var response_xml_text = await result.text();
+  var responseXMLText = await result.text();
 
-  await update_quiz_page(response_xml_text);
+  await updateQuizPage(responseXMLText);
 
 }
 
 /**
-* Helper function to parse a response from the server and go to the specified url.
-* same function is in waitforquestion.js - leave for now in case more events added
-* @param {string} response_xml_text The XML returned by quizdatastudent.php
+ * Helper function to parse a response from the server and go to the specified url.
+ * same function is in waitforquestion.js - leave for now in case more events added
+ * @param {string} responseXMLText The XML returned by quizdatastudent.php
  */
-function update_quiz_page(response_xml_text) {
+function updateQuizPage(responseXMLText) {
 
   const parser = new DOMParser();
-  const response_xml = parser.parseFromString(response_xml_text, 'text/html');
+  const responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
-  var quizresponse = response_xml.getElementsByTagName('tcquiz').item(0);
+  var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
-  //ERROR handling?
+  // ERROR handling?
 
   if (quizresponse === null) {
     Notification.addNotification({
@@ -153,27 +140,23 @@ function update_quiz_page(response_xml_text) {
 
     if (quizstatus == 'showquestion') {
 
-        //you should be on this page, so do nothing
-        //window.goToCurrentQuizPageEvent = null;
-        //clearInterval(window.goToCurrentQuizPageEvent);
-        //var attempt_url = quizresponse.getElementsByTagName('url').item(0).textContent;
-        //window.location.replace(attempt_url);
+        // You should be on this page, so do nothing
 
     } else if (quizstatus == 'showresults') {
 
         window.goToCurrentQuizPageEvent = null;
         clearInterval(window.goToCurrentQuizPageEvent);
-        var result_url = quizresponse.getElementsByTagName('url').item(0).textContent;
-        window.location.replace(result_url);
+        var resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
+        window.location.replace(resultURL);
 
     } else if (quizstatus == 'finalresults') {
 
       window.goToCurrentQuizPageEvent = null;
       clearInterval(window.goToCurrentQuizPageEvent);
 
-    } else if (quizstatus == 'quiznotrunning' || quizstatus == 'waitforquestion'|| quizstatus == 'waitforresults' ||
-            quizstatus == 'noaction' ){
-            //keep trying
+    } else if (quizstatus == 'quiznotrunning' || quizstatus == 'waitforquestion' || quizstatus == 'waitforresults'
+            || quizstatus == 'noaction') {
+            // Keep trying.
 
     } else if (quizstatus == 'error') {
       var errmsg = quizresponse.getElementsByTagName('message').item(0).textContent;
@@ -183,8 +166,7 @@ function update_quiz_page(response_xml_text) {
           type: 'error'
       });
 
-    }
-    else{
+    } else {
       Notification.addNotification({
           message: getString('unknownserverresponse', 'quizaccess_tcquiz') + quizstatus,
           type: 'error'
@@ -195,7 +177,7 @@ function update_quiz_page(response_xml_text) {
 
 }
 
-export const init = (sessionid, quizid, cmid, attemptid, page, time_for_question, POLLING_INTERVAL) => {
+export const init = (sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL) => {
 
-  registerEventListeners(sessionid, quizid, cmid, attemptid, page, time_for_question, POLLING_INTERVAL);
+  registerEventListeners(sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL);
 };

@@ -45,12 +45,12 @@ const registerEventListeners = (sessionid, quizid, cmid, attemptid, POLLING_INTE
           updateNumStudentsEvent = null;
 
           var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getquestion&quizid='
-            +quizid+'&cmid='+ cmid +'&attempt='+attemptid
-            +'&sessionid='+sessionid+'&rejoin=0&sesskey='+ M.cfg.sesskey,{method: 'POST'});
+            + quizid + '&cmid=' + cmid + '&attempt=' + attemptid
+            + '&sessionid=' + sessionid + '&rejoin=0&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
-          var response_xml_text = await result.text();
+          var responseXMLText = await result.text();
 
-          await  go_to_next_url(response_xml_text);
+          await  go_to_next_url(responseXMLText);
 
     },{once: true});
 
@@ -72,25 +72,25 @@ export const init = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
 async function update_number_of_students(sessionid, quizid, cmid, attemptid) {
 
   var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getnumberstudents&quizid='
-    +quizid+'&sessionid='+sessionid+'&cmid='+ cmid +'&attempt='+attemptid
-    +'&currentquestion=0&sesskey='+ M.cfg.sesskey,{method: 'POST'});
+    + quizid + '&sessionid=' + sessionid + '&cmid=' + cmid + '&attempt=' + attemptid
+    + '&currentquestion=0&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
-  var response_xml_text = await result.text();
+  var responseXMLText = await result.text();
 
-  await update_num_students_html(response_xml_text);
+  await update_num_students_html(responseXMLText);
 
 }
 
 /**
  * Helper function to update the html with fetched number of connected students.
- * @param {string} response_xml_text The xml with the number of connected students returned from the server
+ * @param {string} responseXMLText The XML with the number of connected students returned from the server
  */
-function update_num_students_html(response_xml_text){
+function update_num_students_html(responseXMLText){
 
   var parser = new DOMParser();
-  var response_xml = parser.parseFromString(response_xml_text, 'text/html');
+  var responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
-  var quizresponse = response_xml.getElementsByTagName('tcquiz').item(0);
+  var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
   var number_of_students = quizresponse.getElementsByTagName('numberstudents').item(0).textContent;
 
@@ -103,14 +103,14 @@ function update_num_students_html(response_xml_text){
  * Helper function to parse a response from the server and go to the specified url.
  * The url should either be of the next quiz page of the final results.
  * The only responses should have url field
- * @param {string} response_xml_text The XML returned by quizdatateacher.php
+ * @param {string} responseXMLText The XML returned by quizdatateacher.php
  */
-function go_to_next_url(response_xml_text){
+function go_to_next_url(responseXMLText){
 
   var parser = new DOMParser();
-  var response_xml = parser.parseFromString(response_xml_text, 'text/html');
+  var responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
-  var quizresponse = response_xml.getElementsByTagName('tcquiz').item(0);
+  var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
   var next_url = quizresponse.getElementsByTagName('url').item(0).textContent;
   window.location.replace(next_url);

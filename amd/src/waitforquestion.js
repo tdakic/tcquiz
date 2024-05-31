@@ -48,25 +48,25 @@ export const init = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
 async function go_to_current_quiz_page(sessionid, quizid, cmid, attemptid) {
 
   var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatastudent.php?quizid='
-    +quizid+'&sessionid='+sessionid+'&cmid='+ cmid +'&attempt='+attemptid
-    +'&sesskey='+ M.cfg.sesskey,{method: 'POST'});
+    + quizid + '&sessionid=' + sessionid + '&cmid=' + cmid + '&attempt=' + attemptid
+    + '&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
-  var response_xml_text = await result.text();
+  var responseXMLText = await result.text();
 
-  await update_quiz_page(response_xml_text);
+  await update_quiz_page(responseXMLText);
 
 }
 
 /**
  * Helper function to parse a response from the server and go to the specified url.
- * @param {string} response_xml_text The XML returned by quizdatastudent.php
+ * @param {string} responseXMLText The XML returned by quizdatastudent.php
  */
-function update_quiz_page(response_xml_text) {
+function update_quiz_page(responseXMLText) {
 
         const parser = new DOMParser();
-        const response_xml = parser.parseFromString(response_xml_text, 'text/html');
+        const responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
-        var quizresponse = response_xml.getElementsByTagName('tcquiz').item(0);
+        var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
         if (quizresponse === null) {
             Notification.addNotification({

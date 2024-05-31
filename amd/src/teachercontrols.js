@@ -49,8 +49,8 @@ document.addEventListener('click', async(e) => {
             +quizid+'&joincode='+joincode+'&cmid='+ cmid +'&attempt='+attemptid
           +'&sessionid='+sessionid+'&rejoin=false&page='+page+'&sesskey='+ M.cfg.sesskey,{method: 'POST'});
 
-          var response_xml_text = await result.text();
-          await  parse_next_url(response_xml_text);
+          var responseXMLText = await result.text();
+          await  parse_next_url(responseXMLText);
 
         }
   },{once: true} );
@@ -117,40 +117,40 @@ document.addEventListener('click', async(e) => {
 async function update_number_of_answers(sessionid, quizid, cmid, attemptid) {
 
   var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getnumberanswers&quizid='
-    +quizid+'&sessionid='+sessionid+'&cmid='+ cmid +'&attempt='+attemptid
-    +'&sesskey='+ M.cfg.sesskey,{method: 'POST'});
+    + quizid + '&sessionid=' + sessionid + '&cmid=' + cmid + '&attempt=' + attemptid
+    + '&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
-  var response_xml_text = await result.text();
+  var responseXMLText = await result.text();
 
-  await update_num_answers_html(response_xml_text);
+  await update_num_answers_html(responseXMLText);
 
 }
 
 /**
  * helper function to update the html with number of submitted answers
- * @param {string} response_xml_text
+ * @param {string} responseXMLText
  */
-function update_num_answers_html(response_xml_text){
+function update_num_answers_html(responseXMLText){
 
   var parser = new DOMParser();
-  var response_xml = parser.parseFromString(response_xml_text, 'text/html');
+  var responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
-  var quizresponse = response_xml.getElementsByTagName('tcquiz').item(0);
+  var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
   var number_of_answers = quizresponse.getElementsByTagName('numanswers').item(0).textContent;
   document.querySelector(Selectors.regions.numAnswers).innerHTML = number_of_answers;
 }
 
 /**
- * helper function to replace the current page with the attempt page specified in the response_xml_text
- * @param {string} response_xml_text
+ * Helper function to replace the current page with the attempt page specified in the responseXMLText
+ * @param {string} responseXMLText
  */
-/*function parse_next_url(response_xml_text){
+/*function parse_next_url(responseXMLText){
 
   var parser = new DOMParser();
-  var response_xml = parser.parseFromString(response_xml_text, 'text/html');
+  var responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
-  var quizresponse = response_xml.getElementsByTagName('tcquiz').item(0);
+  var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
   var next_url = quizresponse.getElementsByTagName('url').item(0).textContent;
 
   window.location.replace(next_url);

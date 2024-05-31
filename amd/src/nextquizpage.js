@@ -34,36 +34,37 @@ const registerEventListeners = (sessionid, quizid, cmid, attemptid, page) => {
   const nextQuestionAction = document.querySelector(Selectors.actions.nextquestionButtonR);
   nextQuestionAction.addEventListener('click', async(e) => {
           e.preventDefault();
-          //the page of the quiz attempt that will be displayed is detrmined by quizdatateacher.php
-          //this is left here for possible error checking additions later
+          // The page of the quiz attempt that will be displayed is detrmined by quizdatateacher.php.
+          // This is left here for possible error checking additions later
           page++;
 
-          var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getquestion&quizid='
-            +quizid+'&cmid='+ cmid +'&attempt='+attemptid
-            +'&sessionid='+sessionid+'&rejoin=0&page='+page+'&sesskey='+ M.cfg.sesskey,{method: 'POST'});
+          var result = await fetch(M.cfg.wwwroot
+            + '/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getquestion&quizid='
+            + quizid + '&cmid=' + cmid + '&attempt=' + attemptid
+            + '&sessionid=' + sessionid + '&rejoin=0&page=' + page + '&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
-          var response_xml_text = await result.text();
+          var responseXMLText = await result.text();
 
-          await  parse_next_url(response_xml_text);
+          await parseNextURL(responseXMLText);
 
-      },{once: true});
+      }, {once: true});
 };
 
 
 /**
- * helper function to replace the current page with the attempt page specified in the response_xml_text
- * @param {string} response_xml_text
+ * Helper function to replace the current page with the attempt page specified in the responseXMLText
+ * @param {string} responseXMLText
  */
-function parse_next_url(response_xml_text){
+function parseNextURL(responseXMLText) {
 
   var parser = new DOMParser();
-  var response_xml = parser.parseFromString(response_xml_text, 'text/html');
+  var responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
-  var quizresponse = response_xml.getElementsByTagName('tcquiz').item(0);
+  var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
-  var next_url = quizresponse.getElementsByTagName('url').item(0).textContent;
+  var nextURL = quizresponse.getElementsByTagName('url').item(0).textContent;
 
-  window.location.replace(next_url);
+  window.location.replace(nextURL);
 
 }
 
