@@ -34,25 +34,26 @@ const Selectors = {
 
 const registerEventListeners = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
 
-  var updateNumStudentsEvent = setInterval(async () =>
-    {await update_number_of_students(sessionid, quizid, cmid, attemptid);}, POLLING_INTERVAL);
+  var updateNumStudentsEvent = setInterval(async() => {
+    await updateNumberOfStudents(sessionid, quizid, cmid, attemptid);
+  }, POLLING_INTERVAL);
 
   /* Teacher clicks the next button when they are ready to display the first question */
   const nextQuestionAction = document.querySelector(Selectors.actions.nextButton);
-  nextQuestionAction.addEventListener('click', async (e) => {
+  nextQuestionAction.addEventListener('click', async(e) => {
           e.preventDefault();
           clearInterval(updateNumStudentsEvent);
           updateNumStudentsEvent = null;
 
-          var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getquestion&quizid='
+          var result = await fetch(M.cfg.wwwroot + '/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getquestion&quizid='
             + quizid + '&cmid=' + cmid + '&attempt=' + attemptid
             + '&sessionid=' + sessionid + '&rejoin=0&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
           var responseXMLText = await result.text();
 
-          await  go_to_next_url(responseXMLText);
+          await goToNextUrl(responseXMLText);
 
-    },{once: true});
+    }, {once: true});
 
 };
 
@@ -69,15 +70,15 @@ export const init = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
  * @param {cmid} cmid Course module id of the current quiz.
  * @param {attemptid} attemptid The attemptid of the teacher's preview. Needed for displaying the first question.
  */
-async function update_number_of_students(sessionid, quizid, cmid, attemptid) {
+async function updateNumberOfStudents(sessionid, quizid, cmid, attemptid) {
 
-  var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getnumberstudents&quizid='
+  var result = await fetch(M.cfg.wwwroot + '/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getnumberstudents&quizid='
     + quizid + '&sessionid=' + sessionid + '&cmid=' + cmid + '&attempt=' + attemptid
     + '&currentquestion=0&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
   var responseXMLText = await result.text();
 
-  await update_num_students_html(responseXMLText);
+  await updateNumberOfStudentsHTML(responseXMLText);
 
 }
 
@@ -85,18 +86,16 @@ async function update_number_of_students(sessionid, quizid, cmid, attemptid) {
  * Helper function to update the html with fetched number of connected students.
  * @param {string} responseXMLText The XML with the number of connected students returned from the server
  */
-function update_num_students_html(responseXMLText){
+function updateNumberOfStudentsHTML(responseXMLText) {
 
   var parser = new DOMParser();
   var responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
   var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
-  var number_of_students = quizresponse.getElementsByTagName('numberstudents').item(0).textContent;
+  var numberOfStudents = quizresponse.getElementsByTagName('numberstudents').item(0).textContent;
 
-  document.querySelector(Selectors.regions.numStudentsSpan).innerHTML = number_of_students;
-  //return;
-
+  document.querySelector(Selectors.regions.numStudentsSpan).innerHTML = numberOfStudents;
 }
 
 /**
@@ -105,14 +104,14 @@ function update_num_students_html(responseXMLText){
  * The only responses should have url field
  * @param {string} responseXMLText The XML returned by quizdatateacher.php
  */
-function go_to_next_url(responseXMLText){
+function goToNextUrl(responseXMLText) {
 
   var parser = new DOMParser();
   var responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
   var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
-  var next_url = quizresponse.getElementsByTagName('url').item(0).textContent;
-  window.location.replace(next_url);
+  var nextUrl = quizresponse.getElementsByTagName('url').item(0).textContent;
+  window.location.replace(nextUrl);
 
 }

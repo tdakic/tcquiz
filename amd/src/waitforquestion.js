@@ -26,10 +26,11 @@
 import Notification from 'core/notification';
 import {get_string as getString} from 'core/str';
 
-const registerEventListeners = (sessionid, quizid, cmid, attemptid,POLLING_INTERVAL) => {
-  //polling event that determines when the state of the tcquiz has changed
-  window.goToCurrentQuizPageEvent = setInterval(async () =>
-    {await go_to_current_quiz_page(sessionid, quizid, cmid, attemptid);}, POLLING_INTERVAL);
+const registerEventListeners = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
+  // Polling event that determines when the state of the tcquiz has changed.
+  window.goToCurrentQuizPageEvent = setInterval(async() =>{
+    await goToCurrentQuizPage(sessionid, quizid, cmid, attemptid);
+  }, POLLING_INTERVAL);
 };
 
 export const init = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
@@ -45,15 +46,15 @@ export const init = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
  * @param {cmid} cmid Course module id of the current quiz.
  * @param {attemptid} attemptid The attemptid of the student's attempt.
  */
-async function go_to_current_quiz_page(sessionid, quizid, cmid, attemptid) {
+async function goToCurrentQuizPage(sessionid, quizid, cmid, attemptid) {
 
-  var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatastudent.php?quizid='
+  var result = await fetch(M.cfg.wwwroot + '/mod/quiz/accessrule/tcquiz/quizdatastudent.php?quizid='
     + quizid + '&sessionid=' + sessionid + '&cmid=' + cmid + '&attempt=' + attemptid
     + '&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
   var responseXMLText = await result.text();
 
-  await update_quiz_page(responseXMLText);
+  await updateQuizPage(responseXMLText);
 
 }
 
@@ -61,12 +62,13 @@ async function go_to_current_quiz_page(sessionid, quizid, cmid, attemptid) {
  * Helper function to parse a response from the server and go to the specified url.
  * @param {string} responseXMLText The XML returned by quizdatastudent.php
  */
-function update_quiz_page(responseXMLText) {
+function updateQuizPage(responseXMLText) {
 
         const parser = new DOMParser();
         const responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
         var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
+        var resultURL;
 
         if (quizresponse === null) {
             Notification.addNotification({
@@ -83,36 +85,33 @@ function update_quiz_page(responseXMLText) {
 
             window.goToCurrentQuizPageEvent = null;
             clearInterval(window.goToCurrentQuizPageEvent);
-            var attempt_url = quizresponse.getElementsByTagName('url').item(0).textContent;
-            window.location.replace(attempt_url);
+            var attemptURL = quizresponse.getElementsByTagName('url').item(0).textContent;
+            window.location.replace(attemptURL);
 
-          }
-          else if (quizstatus == 'showresults') {
+          } else if (quizstatus == 'showresults') {
 
             window.goToCurrentQuizPageEvent = null;
             clearInterval(window.goToCurrentQuizPageEvent);
-            var result_url = quizresponse.getElementsByTagName('url').item(0).textContent;
-            window.location.replace(result_url);
-          }
-          else if (quizstatus == 'finalresults') {
+            resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
+            window.location.replace(resultURL);
+
+          } else if (quizstatus == 'finalresults') {
              window.goToCurrentQuizPageEvent = null;
              clearInterval(window.goToCurrentQuizPageEvent);
-             var result_url = quizresponse.getElementsByTagName('url').item(0).textContent;
-             window.location.replace(result_url);
-          }
-          else if (quizstatus == 'quiznotrunning' || quizstatus == 'waitforquestion'|| quizstatus == 'waitforresults' ||
-                quizstatus == 'noaction' ){
-                //keep trying
-          }
-          else if (quizstatus == 'error') {
+             resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
+             window.location.replace(resultURL);
+
+          } else if (quizstatus == 'quiznotrunning' || quizstatus == 'waitforquestion' || quizstatus == 'waitforresults' ||
+                quizstatus == 'noaction') {
+                // Keep trying.
+          } else if (quizstatus == 'error') {
               var errmsg = quizresponse.getElementsByTagName('message').item(0).textContent;
 
               Notification.addNotification({
                   message: errmsg,
                   type: 'error'
               });
-          }
-          else{
+          } else {
               Notification.addNotification({
                   message: getString('unknownserverresponse', 'quizaccess_tcquiz') + quizstatus,
                   type: 'error'

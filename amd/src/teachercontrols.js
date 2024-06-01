@@ -26,7 +26,7 @@
 const Selectors = {
     actions: {
         endquestionButton: '[data-action="quizaccess_tcquiz/end-question_button"]',
-        //nextquestionButton: '[data-action="quizaccess_tcquiz/next-question_button"]',
+        // For upadating teacher controls later: nextquestionButton: '[data-action="quizaccess_tcquiz/next-question_button"]',
     },
     regions: {
         numAnswers: '[data-region="quizaccess_tcquiz/numberanswers_span"]',
@@ -34,9 +34,9 @@ const Selectors = {
  },
 };
 
-const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, time_for_question, POLLING_INTERVAL) => {
+const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL) => {
 
-/*  left here to use when a better teacher controls are added
+/*  Left here to use when a better teacher controls are added
 document.addEventListener('click', async(e) => {
         if (e.target.closest(Selectors.actions.nextquestionButton)) {
           e.preventDefault();
@@ -56,51 +56,51 @@ document.addEventListener('click', async(e) => {
   },{once: true} );
 */
 
-  //this should prevent "Unsaved changes" pop-up which might happen if the teacher interacts with the
-  //question and then clicks on the End question button
-  window.addEventListener('beforeunload', function (event) {
+  // This should prevent "Unsaved changes" pop-up which might happen if the teacher interacts with the
+  // question and then clicks on the End question button.
+  window.addEventListener('beforeunload', function(event) {
     event.stopImmediatePropagation();
   });
 
-  // handles teacher clicking on the End question button
+  // Handles teacher clicking on the End question button
   const endQuestionAction = document.querySelector(Selectors.actions.endquestionButton);
   endQuestionAction.addEventListener('click', async(e) => {
             e.preventDefault();
             clearInterval(updateNumAnswersEvent);
             updateNumAnswersEvent = null;
 
-            document.querySelector(Selectors.regions.timeLeft).innerHTML = 0; //will this stop setInterval?
+            document.querySelector(Selectors.regions.timeLeft).innerHTML = 0; // Will this stop setInterval?
             clearInterval(timer);
             timer = null;
             const req = new XMLHttpRequest();
-            req.open("POST", M.cfg.wwwroot+
-              '/mod/quiz/accessrule/tcquiz/change_question_state.php?sessionid='+sessionid+'&cmid='+cmid+
-              '&sesskey='+ M.cfg.sesskey);
+            req.open("POST", M.cfg.wwwroot +
+              '/mod/quiz/accessrule/tcquiz/change_question_state.php?sessionid=' + sessionid + '&cmid=' + cmid +
+              '&sesskey=' + M.cfg.sesskey);
             req.send();
 
             req.onload = () => {
               document.getElementById('responseform').submit();
             };
-    },{once: true} );
+    }, {once: true});
 
-    var updateNumAnswersEvent = setInterval(async () =>
-      {await update_number_of_answers(sessionid, quizid, cmid, attemptid);}, POLLING_INTERVAL);
+    var updateNumAnswersEvent = setInterval(async() => {
+      await updateNumberOfAnswers(sessionid, quizid, cmid, attemptid);
+    }, POLLING_INTERVAL);
 
+    var timeLeft = timeForQuestion; // +1 to wait for everyone?
 
-    var timeLeft = time_for_question; //+1 to wait for everyone?
-
-    //teacher timer
+    // Teacher timer
     var timer = setInterval(function() {
-        var timeLeft_html = document.querySelector(Selectors.regions.timeLeft);
+        var timeLeftHTML = document.querySelector(Selectors.regions.timeLeft);
         timeLeft--;
-        timeLeft_html.innerHTML = timeLeft;
+        timeLeftHTML.innerHTML = timeLeft;
 
         if (timeLeft <= 0) {
           clearInterval(timer);
           timer = null;
           clearInterval(updateNumAnswersEvent);
           updateNumAnswersEvent = null;
-          timeLeft_html.innerHTML = 0;
+          timeLeftHTML.innerHTML = 0;
           document.getElementById('responseform').submit();
         }
     }, 1000);
@@ -114,38 +114,38 @@ document.addEventListener('click', async(e) => {
  * @param {cmid} cmid Course module id of the current quiz.
  * @param {attemptid} attemptid The attemptid of the teacher's attempt.
  */
-async function update_number_of_answers(sessionid, quizid, cmid, attemptid) {
+async function updateNumberOfAnswers(sessionid, quizid, cmid, attemptid) {
 
-  var  result = await fetch(M.cfg.wwwroot+'/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getnumberanswers&quizid='
+  var result = await fetch(M.cfg.wwwroot + '/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getnumberanswers&quizid='
     + quizid + '&sessionid=' + sessionid + '&cmid=' + cmid + '&attempt=' + attemptid
     + '&sesskey=' + M.cfg.sesskey, {method: 'POST'});
 
   var responseXMLText = await result.text();
 
-  await update_num_answers_html(responseXMLText);
+  await updateNumAnswersHtml(responseXMLText);
 
 }
 
 /**
- * helper function to update the html with number of submitted answers
+ * Helper function to update the html with number of submitted answers
  * @param {string} responseXMLText
  */
-function update_num_answers_html(responseXMLText){
+function updateNumAnswersHtml(responseXMLText) {
 
   var parser = new DOMParser();
   var responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
   var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
-  var number_of_answers = quizresponse.getElementsByTagName('numanswers').item(0).textContent;
-  document.querySelector(Selectors.regions.numAnswers).innerHTML = number_of_answers;
+  var numberOfAnswers = quizresponse.getElementsByTagName('numanswers').item(0).textContent;
+  document.querySelector(Selectors.regions.numAnswers).innerHTML = numberOfAnswers;
 }
 
 /**
  * Helper function to replace the current page with the attempt page specified in the responseXMLText
  * @param {string} responseXMLText
  */
-/*function parse_next_url(responseXMLText){
+/* For when the teacher controls are improved function parse_next_url(responseXMLText){
 
   var parser = new DOMParser();
   var responseXML = parser.parseFromString(responseXMLText, 'text/html');
@@ -157,7 +157,7 @@ function update_num_answers_html(responseXMLText){
 
 }*/
 
-export const init = (sessionid, quizid, cmid, attemptid, page, time_for_question,POLLING_INTERVAL) => {
+export const init = (sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL) => {
 
-  registerEventListeners(sessionid, quizid, cmid, attemptid, page, time_for_question, POLLING_INTERVAL);
+  registerEventListeners(sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL);
 };
