@@ -242,7 +242,7 @@ class tcquiz_attempt extends quiz_attempt {
         $slotsonthispage = $this->get_slots($thispage);
 
         try {
-            $this->quba->process_all_actions($timestamp);
+            $this->quba->process_all_actions($timenow);
             foreach ($slotsonthispage as $slot) {
                 $this->quba->finish_question($slot, $timenow);
             }
