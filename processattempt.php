@@ -101,7 +101,7 @@ if ($attemptobj->is_finished()) {
 }
 
 // If this page cannot be accessed, notify user and send them to the correct page.
-if (!$finishattempt && !$attemptobj->check_page_access($thispage)) {
+if (!$attemptobj->check_page_access($thispage)) {
     throw new moodle_exception('submissionoutofsequencefriendlymessage', 'question',
             $attemptobj->attempt_url(null, $attemptobj->get_currentpage()));
 }
