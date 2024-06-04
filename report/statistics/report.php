@@ -63,6 +63,8 @@ class tcquiz_statistics_report extends quiz_statistics_report {
         $whichattempts = mod_quiz\quiz_attempt::IN_PROGRESS;
 
         $reporturl = new moodle_url('/mod/quiz/report.php', $pageoptions);
+        $reporturl->param('whichtries', $whichtries);
+        $reporturl->param('count', $whichtries);
 
         if ($whichattempts != $quiz->grademethod) {
             $reporturl->param('whichattempts', $whichattempts);
@@ -72,6 +74,7 @@ class tcquiz_statistics_report extends quiz_statistics_report {
             $reporturl->param('whichtries', $whichtries);
         }
 
+        var_dump($whichattempts);
         // Find out current groups mode.
         $currentgroup = $this->get_current_group($cm, $course, $this->context);
         $nostudentsingroup = false; // True if a group is selected and there is no one in it.
@@ -247,6 +250,8 @@ class tcquiz_statistics_report extends quiz_statistics_report {
             $progress = new \core\progress\none();
         }
 
+
+        $whichattempts = QUIZ_ATTEMPTLAST;  // Hack to get rid of the unassigned whichattempts in using_attempts_string_id.
         $qubaids = tcquiz_statistics_qubaids_condition($quiz->id, $sessionid, $groupstudentsjoins, $whichattempts);
 
         $qcalc = new \core_question\statistics\questions\calculator($questions, $progress);
