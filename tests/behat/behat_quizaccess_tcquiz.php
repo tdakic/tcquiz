@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Steps definitions related to mod_quiz.
+ * Steps definitions related to quizacess_tcquiz.
  *
  * @package   quizaccess_tcquiz
  * @category  test
@@ -31,6 +31,9 @@ require_once(__DIR__ . '/../../../../../../question/tests/behat/behat_question_b
 use Behat\Gherkin\Node\TableNode as TableNode;
 
 use Behat\Mink\Exception\ExpectationException as ExpectationException;
+
+use Behat\Mink\Exception\ResponseTextException;
+
 use mod_quiz\quiz_attempt;
 use mod_quiz\quiz_settings;
 
@@ -42,8 +45,53 @@ use mod_quiz\quiz_settings;
  */
 class behat_quizaccess_tcquiz extends behat_base {
 
+
     /**
-     * Wait for the page to be loaded
+     * Waits for a given number of seconds
+     *
+     * @param int $seconds
+     *   How long to wait.
+     *
+     * @When I wait :seconds second(s)
+     */
+    public function wait($seconds) {
+      sleep($seconds);
+    }
+
+    /**
+     * @When I wait :seconds second(s) for :text to appear
+     *
+     * @param $seconds
+     * @param $text
+     * @throws ResponseTextException
+     */
+    public function i_wait_for_text_to_appear($seconds, $text) {
+        /* couldn't figure out how to use the spin function from
+           https://stackoverflow.com/questions/46737255/how-to-make-behat-wait-for-an-element-to-be-displayed-on-the-screen-before-filli
+        */
+
+        $startTime = time();
+
+        do {
+            try {
+                $node = $this->getSession()->getPage()->find("named", array("content","The correct answer"));
+                if ($node) {
+                  return true;
+                }
+            } catch (ExpectationException $e) {
+                /* Intentionally left blank. */
+            }
+        } while (time() - $startTime < $seconds);
+
+        throw new ResponseTextException(
+            sprintf('Cannot find the element .answer after %s seconds', $seconds),
+            $this->getSession()
+        );
+
+    }
+
+    /**
+     * Wait for the page to be loaded - not used
      *
      * @When /^I wait for the page to be loaded$/
      */
@@ -51,4 +99,6 @@ class behat_quizaccess_tcquiz extends behat_base {
         $xml = file_get_contents($this->getSession()->getCurrentUrl());
         $this->getSession()->wait(10000, "document.readyState === 'complete'");
     }
+
+
 }
