@@ -118,8 +118,10 @@ $string['notauthorised'] = 'You are not authorised to control this quiz';
 
 $string['pluginadministration'] = 'TCQuiz administration';
 
-$string['nottcquiz'] = 'This quiz is not set up as a TCQuiz ';
+$string['nottcquiz'] = 'This quiz is not set up as a TCQuiz.';
 $string['notcurrentpage'] = 'You tried to access the page of the quiz that is not the page currently being displayed by the teacher.';
-$string['nosession'] = 'The requested session of TCQuiz doesn not exist';
+$string['nosession'] = 'The requested session of TCQuiz doesn not exist.';
 $string['notrightquizstate'] = 'The quiz is currently in a different state.';
-$string['notyoursession'] = 'You are not the teacher for this session';
+$string['notyoursession'] = 'You are not the teacher for this session.';
+$string['notallowedtostarttcquiz'] = 'You are not allowed to start this TCQuiz.';
+$string['notallowedtoattempttcquiz'] = 'You are not allowed attempt this TCQuiz.';

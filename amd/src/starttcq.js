@@ -27,7 +27,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import $ from 'jquery';
+// import $ from 'jquery';
 import Notification from 'core/notification';
 import {get_string as getString} from 'core/str';
 
@@ -48,16 +48,17 @@ const registerEventListeners = (sessionid, joincode, timestamp, currentpage, sta
 
       });
 
-*/
+      This works in both 4.3 and 4.4 but seem to cause issus for behat. I added an intermediary script
+      tcquiz_teacher_start_page.
 
       if (document.readyState === "complete") {
-          $("#page-content").html($("#starttcquizform"), false);
+         $("#page-content").html($("#starttcquizform"), false);
       } else {
           window.addEventListener('load', function() {
             $("#page-content").html($("#starttcquizform"), false);
           });
       }
-
+    */
     // Handle the teacher clicking on the End button to end the session (if there is one).
     const endTCQAction = document.querySelector(Selectors.actions.endButton);
     if (endTCQAction !== null) {

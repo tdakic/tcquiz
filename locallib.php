@@ -343,6 +343,42 @@ function close_running_tcq_session($quiz) {
 }
 
 /**
+ * Return the list with information of the tcquiz session that is currently running
+ * @param context_module $quizid the id of this quiz.
+ * @return array('sessionid', 'joincode', 'timestamp', 'currentpage', 'status',  'attemptid');
+ */
+function get_open_session($quizid): array {
+
+    global $DB;
+    global $USER;
+
+    // Get the session that is in progress (status between 10-40 inclusive).
+    // Should be only one if the housekeeping is done right.
+
+    $sql = "SELECT * FROM {quizaccess_tcquiz_attempt} qta
+                    LEFT JOIN {quiz_attempts} qa ON qta.attemptid = qa.id
+                    WHERE qa.state = 'inprogress' AND qa.quiz = :quizid AND qa.userid = :uid";
+
+    // Check to see if an open attempt of the teacher is a tcquiz attempt.
+    if (!$attempt = $DB->get_record_sql($sql, ['quizid' => $quizid, 'uid' => $USER->id])) {
+        return [];
+    } else {
+        // Get the session assocaited with the teacher's attempt and return its data.
+        // Status should be between 10 (TCQUIZ_STATUS_READYTOSTART) and 40 (TCQUIZ_STATUS_FINALRESULTS).
+        $sql = "SELECT * FROM {quizaccess_tcquiz_session} WHERE id = :sessid AND status BETWEEN :running and :results";
+        if (!$sess = $DB->get_record_sql($sql, ['sessid' => $attempt->sessionid, 'running' => TCQUIZ_STATUS_READYTOSTART,
+            'results' => TCQUIZ_STATUS_FINALRESULTS])) {
+            return [];
+        } else {
+            return ['sessionid' => $sess->id, 'joincode' => $sess->joincode,
+              'timestamp' => date('m/d/Y H:i:s', $sess->timestamp), 'currentpage' => $sess->currentpage,
+              'status' => $sess->status, 'attemptid' => $attempt->id];
+        }
+    }
+}
+
+
+/**
  * Puts all tcqsessions in TCQUIZ_STATUS_FINISHED state
  * For now there should only be one open TCQ session, so this is for development
  */

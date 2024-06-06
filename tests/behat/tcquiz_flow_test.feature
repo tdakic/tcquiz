@@ -53,6 +53,19 @@ Feature: Test that the teacher can control a flow of a TCQuiz
     When I click on "Join quiz" "button"
     #When I wait for the page to be loaded
     Then I should see "Text of the first question"
-    #And I click on "True" "radio" in the "TF1" "question"
-    #And I click on "Submit" "button"
-    #Then I should see "Question done - waiting for results."
+    And I click on "True" "radio" in the "Text of the first question" "question"
+    And I click on "Submit" "button"
+    Then I should see "Question done - waiting for results."
+    And I log out
+    When I am on the "Quiz 1" "mod_quiz > View" page logged in as "teacher"
+    #Then I should see "Rejoin" button
+    #And I click on "Rejoin" button
+
+    #Then I should see "Start new quiz session" - works???
+    Then I should see "Available Session" - fails???
+    #And I should see "Rejoin" "button"
+    #When I click on "Rejoin" "button"
+    #Then I should see "Text of the first question"
+    #And I should see "Number of received answers 1"
+    #And I click on "End question" "button"
+    #Then I should see "The correct answer"

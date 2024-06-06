@@ -17,8 +17,8 @@
 use mod_quiz\quiz_settings;
 
 require_once(__DIR__ . '/../../../../config.php');
-require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/classes/form/tcq_start_form.php');
-require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/classes/form/tcq_student_join_form.php');
+//require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/classes/form/tcq_start_form.php');
+//require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/classes/form/tcq_student_join_form.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -199,7 +199,11 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
 
             if (has_capability('mod/quiz:preview', $context)) {
 
-                if (!$sessdata = self::get_open_session($context)) {
+                redirect(new \moodle_url('/mod/quiz/accessrule/tcquiz/tcq_teacher_start_page', ['id' => $this->quiz->cmid,
+                                         'sesskey' => sesskey()]));
+                die();
+
+                /* if (!$sessdata = self::get_open_session($context)) {
                     $existingsession = false;
                     $sessdata = ['sessionid' => 0, 'joincode' => '', 'timestamp' => null, 'currentpage' => 0,
                                   'status' => 0, 'attemptid' => 0 ];
@@ -224,11 +228,15 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
                     'currentpage' => $sessdata['currentpage'],
                     'status' => $sessdata['status'], 'attemptid' => $sessdata['attemptid'],
                     'existingsession' => $existingsession, 'quizid' => $this->quiz->id, 'cmid' => $this->quiz->cmid,
-                    'formhtml' => $mform->render()]);
+                    'formhtml' => $mform->render()]); */
 
             } else {
 
-                $mform = new tcq_student_join_form(customdata:['cmid' => $this->quiz->cmid, 'quizid' => $this->quiz->id ]);
+                redirect(new \moodle_url('/mod/quiz/accessrule/tcquiz/tcq_student_start_page', ['id' => $this->quiz->cmid,
+                                         'sesskey' => sesskey()]));
+                die();
+
+                /* $mform = new tcq_student_join_form(customdata:['cmid' => $this->quiz->cmid, 'quizid' => $this->quiz->id ]);
 
                 if ($fromform = $mform->get_data()) { // Form validated.
 
@@ -241,7 +249,7 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
                 }
 
                 $messages[] = $OUTPUT->render_from_template('quizaccess_tcquiz/student_join_tcq', [
-                  'quizid' => $this->quiz->id, 'cmid' => $this->quiz->cmid, 'formhtml' => $mform->render()]);
+                  'quizid' => $this->quiz->id, 'cmid' => $this->quiz->cmid, 'formhtml' => $mform->render()]); */
             }
         }
         return $messages;
@@ -298,11 +306,12 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
         return $messages;
     }
 
-      /**
-       * Return the list with information of the tcquiz session that is currently running
-       * @param context_module $context the quiz context.
-       * @return array('sessionid', 'joincode', 'timestamp', 'currentpage', 'status',  'attemptid');
-       */
+    /**
+     * Moved to locallib.php - not needed here
+     * Return the list with information of the tcquiz session that is currently running
+     * @param context_module $context the quiz context.
+     * @return array('sessionid', 'joincode', 'timestamp', 'currentpage', 'status',  'attemptid');
+     */
     private function get_open_session($context): array {
 
         global $DB;

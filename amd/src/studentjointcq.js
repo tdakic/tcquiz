@@ -28,14 +28,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import $ from 'jquery';
+// import $ from 'jquery';
 
 const registerEventListeners = () => {
 
   /* In 4.3 this works: window.addEventListener('load', function(){
 
       $("#page-content").html($("#studentjointcquizform"));
-    });*/
+    });
+
+    In 4.4 this works, but I have added an intermediary file tcq_student_start_page.php
+    so I don't need to deal with css.
     if (document.readyState === "complete") {
         $("#page-content").html($("#studentjointcquizform"));
     } else {
@@ -43,6 +46,7 @@ const registerEventListeners = () => {
         $("#page-content").html($("#studentjointcquizform"));
         });
     }
+  */
 
 };
 
