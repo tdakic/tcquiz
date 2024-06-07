@@ -21,74 +21,84 @@ Feature: Test that the teacher can rejoin the quiz and be on the right page.
     And the following "questions" exist:
       | questioncategory | qtype       | name  | questiontext                | correct        |
       | Test questions   | truefalse   | TF1   | Text of the first question  | True           |
-      | Test questions   | truefalse   | TF2   | Text of the second question | False          |
     And the following "activities" exist:
         | activity | name   | intro              | course | idnumber | grade | navmethod  | tcqrequired | questiontime |
-        | quiz     | Quiz 2 | Quiz 2 description | C1     | quiz1    | 100   | free       | 1           | 60          |
+        | quiz     | Quiz 2 | Quiz 2 description | C1     | quiz2    | 100   | free       | 1           | 100          |
     And quiz "Quiz 2" contains the following questions:
       | question | page | maxmark |
       | TF1      | 1    |         |
-      | TF2      | 2    |         |
 
   @javascript
-  Scenario: Teacher creates a TCQuiz, starts it and displays the first question. Then they click on End question button
-  to display the answer to the first question. Then they click Next to display the second question, but this time they
-  wait for the timer to run out. The answer to second question is then displayed. When the teacher clicks Next, the final
-  results are displayed.
+  Scenario: Teacher tries rejoining the tcquiz when: the teacher just started the quiz, the teacher is displaying a
+  question, the teacher is displaying the answers to a question, the teacher is displaying the final results, the
+  quiz is closed.
 
     # The above background doesn't seem to set the quiz to be a TCQuiz.
     When I am on the "Quiz 2" "quiz activity editing" page logged in as "teacher"
     And I expand all fieldsets
     And I set the field "Administer TCQuiz" to "Yes"
-    And I set the field "Default question time" to "60"
+    And I set the field "Default question time" to "100"
     When I click on "Save and display" "button"
 
     # Start new TCQ session.
     Then I should see "Start new quiz session"
-    And I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "teachercode6"
+    And I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "teachercode7"
     When I click on "Start new quiz session" "button"
     Then I should see "Waiting for students to connect"
+
+    # Assume the teacher crashed and they want to reconnect.
+    When I am on the "Quiz 2" "mod_quiz > View" page
+    #Then I should see "Rejoin" "button"
+    Then "Rejoin" "button" should be visible
+    And I should see "teachercode7"
+    When I click on "Rejoin" "button"
+    Then I should see "Waiting for students to connect"
+    And "Next >>" "button" should be visible
+
+
+    # Display the first question.
     When I click on "Next >>" "button"
-
-    # First question is displayed displayed
     Then I should see "Text of the first question"
-    When I click on "End question" "button"
 
+    # Crash again - but this time the teacher should reconnect to question
+    When I am on the "Quiz 2" "mod_quiz > View" page
+    # When I follow "Quiz"
+    Then "Rejoin" "button" should be visible
+    And I should see "teachercode7"
+    When I click on "Rejoin" "button"
+    Then I should see "Text of the first question"
+    And "End question" "button" should be visible
+
+    # End the question. Make sure the results are displayed and crash again.
+    When I click on "End question" "button"
     # The answer to the first question is displayed
     Then I should see "Text of the first question"
     And I should see "The correct answer is 'True'"
-    When I click on "Next >>" "button"
-
-    # The second question is displayed
-    Then I should see "Text of the second question"
-    And I wait 70 seconds
-
-    # The answer to the second question is displayed
-    Then I should see "Text of the second question"
-    And I should see "The correct answer is 'False'"
-    When I click on "Next >>" "button"
-
-    # The final results are displayed
-    Then I should see "Overall number of students achieving grade ranges"
-    When I click on "End quiz" button
-
-    # I should be on the quiz view page
-    Then I should see "Start new quiz session"
-
-    #And I wait for the page to be loaded
-
-    #When I wait for the page to be loaded
-
-    #And I follow "Quiz"
-    When I am on the "Quiz 2" "mod_quiz > View" page logged in as "teacher"
-    Then I should see "Start new quiz session"
-    And I should see "Current page"
-    And "Rejoin" "button" should be visible
-    And I click on "Rejoin" "button"
-    Then I should see "Text of the first question"
-    And I click on "End question" "button"
-    Then I should see "The correct answer is"
-    And I should see "Text of the first question"
+    # Crash.
     When I am on the "Quiz 2" "mod_quiz > View" page
-    And I click on "Rejoin" "button"
-    Then I should see "correct"
+    Then "Rejoin" "button" should be visible
+    And I should see "teachercode7"
+    When I click on "Rejoin" "button"
+    # Still displaying the answer to the first question.
+    Then I should see "Text of the first question"
+    And I should see "The correct answer is 'True'"
+
+    # This should take the teacher to the final results.
+    # There is only one question in the quiz
+    When I click on "Next >>" "button"
+    Then I should see "Attempts: 0"
+    And "End quiz" "button" should be visible
+
+    # Crash.
+    When I am on the "Quiz 2" "mod_quiz > View" page
+    Then "Rejoin" "button" should be visible
+    And I should see "teachercode7"
+    When I click on "Rejoin" "button"
+    # Should be back to final results page.
+    Then I should see "Attempts: 0"
+    And "End quiz" "button" should be visible
+
+    # End the quiz. Make sure that you can't rejoin.
+    When I click on "End quiz" "button"
+    Then I should see "Start new quiz session"
+    And "Rejoin" "button" should not be visible
