@@ -40,6 +40,12 @@ $attempt = required_param('attempt', PARAM_INT );
 $cmid = required_param('cmid', PARAM_INT);
 $sessionid = required_param('sessionid', PARAM_INT);
 
+// In case the user crashed.
+if (!confirm_sesskey()) {
+  redirect(new \moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]));
+}
+
+
 /***********************************************************
  * start of main code
  ***********************************************************/
@@ -105,7 +111,7 @@ if ($status === false) {
 
             echo '<status>showquestion</status>';
             echo '<url>';
-            echo new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php', ['page' => $tcquiz->currentpage, 'showall' => false,
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php', ['r' => rand(), 'page' => $tcquiz->currentpage, 'showall' => false,
               'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id]);
             echo '</url>';
             break;
@@ -114,7 +120,7 @@ if ($status === false) {
 
             echo '<status>showresults</status>';
             echo '<url>';
-            echo new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php', ['page' => $tcquiz->currentpage, 'showall' => 'false',
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php', ['r' => rand(), 'page' => $tcquiz->currentpage, 'showall' => 'false',
               'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id]);
             echo '</url>';
             break;
@@ -126,7 +132,7 @@ if ($status === false) {
 
             echo '<status>finalresults</status>';
             echo '<url>';
-            echo new moodle_url('/mod/quiz/accessrule/tcquiz/report_student_final_results.php', ['attemptid' => $attempt,
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/report_student_final_results.php', ['r' => rand(), 'attemptid' => $attempt,
               'quizid' => $quizid, 'cmid' => $cmid, 'tcqsid' => $sessionid]);
             echo '</url>';
             break;
