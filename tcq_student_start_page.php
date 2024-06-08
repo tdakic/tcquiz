@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php');
 require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/classes/form/tcq_student_join_form.php');
 
-require_sesskey();
+//require_sesskey();
 
 // Get submitted parameters.
 $cmid = required_param('id', PARAM_INT);

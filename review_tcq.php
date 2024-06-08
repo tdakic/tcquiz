@@ -41,8 +41,6 @@ $showall   = optional_param('showall', null, PARAM_BOOL);
 $cmid      = required_param('cmid', PARAM_INT);
 $sessionid = required_param('sessionid', PARAM_INT);
 
-require_sesskey();
-
 $url = new moodle_url('/mod/quiz/view.php', ['id' => $cmid]);
 $PAGE->set_url($url);
 $PAGE->set_cacheable(false);

@@ -28,13 +28,9 @@ import {get_string as getString} from 'core/str';
 
 const registerEventListeners = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
   // Polling event that determines when the state of the tcquiz has changed.
-  window.goToCurrentQuizPageEvent = setInterval(async() =>{
+  document.goToCurrentQuizPageEvent = setInterval(async() =>{
     await goToCurrentQuizPage(sessionid, quizid, cmid, attemptid);
   }, POLLING_INTERVAL);
-};
-
-export const init = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
-  registerEventListeners(sessionid, quizid, cmid, attemptid, POLLING_INTERVAL);
 };
 
 /**
@@ -83,21 +79,21 @@ function updateQuizPage(responseXMLText) {
 
           if (quizstatus == 'showquestion') {
 
-            window.goToCurrentQuizPageEvent = null;
-            clearInterval(window.goToCurrentQuizPageEvent);
+            document.goToCurrentQuizPageEvent = null;
+            clearInterval(document.goToCurrentQuizPageEvent);
             var attemptURL = quizresponse.getElementsByTagName('url').item(0).textContent;
             window.location.replace(attemptURL);
 
           } else if (quizstatus == 'showresults') {
 
-            window.goToCurrentQuizPageEvent = null;
-            clearInterval(window.goToCurrentQuizPageEvent);
+            document.goToCurrentQuizPageEvent = null;
+            clearInterval(document.goToCurrentQuizPageEvent);
             resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
             window.location.replace(resultURL);
 
           } else if (quizstatus == 'finalresults') {
-             window.goToCurrentQuizPageEvent = null;
-             clearInterval(window.goToCurrentQuizPageEvent);
+             document.goToCurrentQuizPageEvent = null;
+             clearInterval(document.goToCurrentQuizPageEvent);
              resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
              window.location.replace(resultURL);
 
@@ -119,3 +115,7 @@ function updateQuizPage(responseXMLText) {
           }
         }
 }
+
+export const init = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
+  registerEventListeners(sessionid, quizid, cmid, attemptid, POLLING_INTERVAL);
+};

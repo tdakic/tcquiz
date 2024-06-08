@@ -31,6 +31,8 @@ use html_writer;
 define('NO_OUTPUT_BUFFERING', true);
 
 require_once(__DIR__ . '/../../../../config.php');
+global $DB, $CFG, $PAGE;
+
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/report/reportlib.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php'); // For constants.
@@ -39,8 +41,6 @@ $attemptid = required_param('attemptid', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 $quizid = optional_param('quizid', 0, PARAM_INT);
 $sessionid = required_param('tcqsid', PARAM_INT);
-
-global $DB, $CFG, $PAGE;
 
 try {
     $attemptobj = tcquiz_attempt::create($attemptid);
@@ -94,6 +94,7 @@ $output .= html_writer::end_tag('p');
 
 $processurl = new \moodle_url('/mod/quiz/view.php', ['id' => $cmid]);
 $PAGE->set_url($processurl);
+$PAGE->set_cacheable(false);
 
 $output .= html_writer::start_tag('form',
           ['action' => $processurl,

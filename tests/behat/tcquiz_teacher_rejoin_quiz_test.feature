@@ -48,7 +48,6 @@ Feature: Test that the teacher can rejoin the quiz and be on the right page.
 
     # Assume the teacher crashed and they want to reconnect.
     When I am on the "Quiz 2" "mod_quiz > View" page
-    #Then I should see "Rejoin" "button"
     Then "Rejoin" "button" should be visible
     And I should see "teachercode7"
     When I click on "Rejoin" "button"

@@ -61,7 +61,7 @@ $PAGE->set_cacheable(false);
 
 // Check login and sesskey.
 require_login($quizobj->get_course(), false, $quizobj->get_cm());
-require_sesskey();
+//require_sesskey();
 
 // If no questions have been set up yet redirect to edit.php or display an error.
 if (!$quizobj->has_questions()) {
@@ -113,7 +113,7 @@ $attemptid = setup_tcquiz_attempt($quizobj, $session, $currentattemptid, $joinco
 
 $url = htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_question.php',
   ['sessionid' => $session->id, 'cmid' => $id, 'quizid' => $quiz->id,
-   'attemptid' => $attemptid,  'sesskey' => sesskey()]), ENT_NOQUOTES);
+   'attemptid' => $attemptid]), ENT_NOQUOTES);
 
 header("Location: ". $url);
 die();

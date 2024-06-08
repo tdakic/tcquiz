@@ -55,7 +55,7 @@ Feature: Test that the student needs the right code to join a TCQuiz
     When I click on "Join quiz" "button"
     Then I should see "-Wrong join code. Try again."
 
-    #teacher sets the joincode
+    # Teacher sets the joincode.
     When I log out
     And I am on the "TCQuiz" "mod_quiz > View" page logged in as "teacher"
     Then I should see "Start new quiz session"
@@ -64,7 +64,7 @@ Feature: Test that the student needs the right code to join a TCQuiz
     When I click on "Start new quiz session" "button"
     Then I should see "Waiting for students to connect"
 
-    #student tries to join with the wrong code
+    # Student tries to join with the wrong code.
     When I log out
     And I am on the "TCQuiz" "mod_quiz > View" page logged in as "student"
     Then I should see "Wait until your teacher gives you the code."
@@ -73,12 +73,12 @@ Feature: Test that the student needs the right code to join a TCQuiz
     When I click on "Join quiz" "button"
     Then I should see "-Wrong join code. Try again."
 
-    #student tries to join with the right code
+    # Student tries to join with the right code.
     When I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "teachercode"
     When I click on "Join quiz" "button"
     Then I should see "Waiting for the first question to be sent"
 
-    #teacher's view should see that one student joined
+    # Teacher's view should see that one student joined.
     When I log out
     And I am on the "TCQuiz" "mod_quiz > View" page logged in as "teacher"
     Then I should see "Available session"

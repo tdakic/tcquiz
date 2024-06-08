@@ -173,7 +173,7 @@ if ($requesttype == 'getquestion') {
     echo '<url>';
     $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php', ['page' => $session->currentpage,
       'showall' => 0, 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid,
-      'sessionid' => $session->id, 'sesskey' => $USER->sesskey ]), ENT_NOQUOTES);
+      'sessionid' => $session->id ]), ENT_NOQUOTES);
     echo $url;
     echo '</url>';
     tcquiz_end_response();

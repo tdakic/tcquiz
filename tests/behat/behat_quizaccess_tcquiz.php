@@ -47,7 +47,7 @@ class behat_quizaccess_tcquiz extends behat_base {
 
 
     /**
-     * Waits for a given number of seconds
+     * Waits for a given number of seconds.
      *
      * @param int $seconds
      *   How long to wait.
@@ -55,10 +55,12 @@ class behat_quizaccess_tcquiz extends behat_base {
      * @When I wait :seconds second(s)
      */
     public function wait($seconds) {
-      sleep($seconds);
+        sleep($seconds);
     }
 
     /**
+     * Wait at most $seconds seconds for the $text to appear
+     *
      * @When I wait :seconds second(s) for :text to appear
      *
      * @param $seconds
@@ -70,18 +72,18 @@ class behat_quizaccess_tcquiz extends behat_base {
            https://stackoverflow.com/questions/46737255/how-to-make-behat-wait-for-an-element-to-be-displayed-on-the-screen-before-filli
         */
 
-        $startTime = time();
+        $starttime = time();
 
         do {
             try {
-                $node = $this->getSession()->getPage()->find("named", array("content","The correct answer"));
+                $node = $this->getSession()->getPage()->find("named", array("content", $text));
                 if ($node) {
-                  return true;
+                    return true;
                 }
             } catch (ExpectationException $e) {
                 /* Intentionally left blank. */
             }
-        } while (time() - $startTime < $seconds);
+        } while (time() - $starttime < $seconds);
 
         throw new ResponseTextException(
             sprintf('Cannot find the element .answer after %s seconds', $seconds),

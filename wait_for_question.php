@@ -38,7 +38,7 @@ $sessionid = required_param('sessionid', PARAM_INT);
 $quizobj = quiz_settings::create_for_cmid($cmid, $USER->id);
 // Check login and sesskey.
 require_login($quizobj->get_course(), false, $quizobj->get_cm());
-require_sesskey();
+//require_sesskey();
 $context = $quizobj->get_context();
 
 if (!$session = $DB->get_record('quizaccess_tcquiz_session', ['quizid' => $quizid, 'id' => $sessionid])) {

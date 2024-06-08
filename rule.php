@@ -199,8 +199,7 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
 
             if (has_capability('mod/quiz:preview', $context)) {
 
-                redirect(new \moodle_url('/mod/quiz/accessrule/tcquiz/tcq_teacher_start_page', ['id' => $this->quiz->cmid,
-                                         'sesskey' => sesskey()]));
+                redirect(new \moodle_url('/mod/quiz/accessrule/tcquiz/tcq_teacher_start_page.php', ['id' => $this->quiz->cmid]));
                 die();
 
                 /* if (!$sessdata = self::get_open_session($context)) {
@@ -232,8 +231,7 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
 
             } else {
 
-                redirect(new \moodle_url('/mod/quiz/accessrule/tcquiz/tcq_student_start_page', ['id' => $this->quiz->cmid,
-                                         'sesskey' => sesskey()]));
+                redirect(new \moodle_url('/mod/quiz/accessrule/tcquiz/tcq_student_start_page.php', ['id' => $this->quiz->cmid]));
                 die();
 
                 /* $mform = new tcq_student_join_form(customdata:['cmid' => $this->quiz->cmid, 'quizid' => $this->quiz->id ]);

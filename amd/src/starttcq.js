@@ -111,7 +111,7 @@ const registerEventListeners = (sessionid, joincode, timestamp, currentpage, sta
 
             } else if (status == tcqConsts.TCQUIZ_STATUS_FINALRESULTS) {
               url = M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/report_final_results.php?mode=overview&quizid=" + quizid +
-              "&id=" + cmid + "&tcqsid=" + sessionid + "&sesskey=" + M.cfg.sesskey;
+              "&id=" + cmid + "&tcqsid=" + sessionid;
               window.location.replace(url);
 
             } else {

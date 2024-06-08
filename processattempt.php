@@ -122,7 +122,7 @@ $status = $attemptobj->process_attempt_tcq($timenow, $thispage);
 
 if (!$attemptobj->is_preview_user()) {
     $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php',
-          ['page' => $page, 'sesskey' => sesskey(), 'showall' => false, 'attempt' => $attemptid,
+          ['page' => $page, 'showall' => false, 'attempt' => $attemptid,
            'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]), ENT_NOQUOTES);
     header("Location: ". $url);
     exit;
@@ -131,7 +131,7 @@ if (!$attemptobj->is_preview_user()) {
     $session->status = TCQUIZ_STATUS_SHOWRESULTS;
     $DB->update_record('quizaccess_tcquiz_session', $session);
     $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',
-         ['page' => $page, 'sesskey' => sesskey(), 'showall' => 0, 'attempt' => $attemptid,
+         ['page' => $page, 'showall' => 0, 'attempt' => $attemptid,
           'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]), ENT_NOQUOTES);
     header("Location: ". $url);
     exit;

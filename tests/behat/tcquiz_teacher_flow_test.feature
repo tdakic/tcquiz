@@ -66,7 +66,7 @@ Feature: Test that the teacher can control a flow of a TCQuiz.
 
     # The answer to the second question is displayed
     Then I should see "Text of the second question"
-    #And I should see "The correct answer is 'False'" - hangs
+    # And I should see "The correct answer is 'False'" - seems that behat thinks the answer is True
     And "Next >>" "button" should be visible
     When I click on "Next >>" "button"
 

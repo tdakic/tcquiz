@@ -37,7 +37,7 @@ $attemptid = required_param('attempt', PARAM_INT);
 // A lot DB querries (because of polling) for nothing ???
 // What if someone knows the state of the questions? Doesn't sound like a big deal.
 
-require_sesskey();
+//require_sesskey();
 
 $session = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid]);
 

@@ -32,8 +32,6 @@ require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php');
 require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/classes/form/tcq_start_form.php');
 
-require_sesskey();
-
 global $CFG, $PAGE, $USER;
 
 // Get submitted parameters.

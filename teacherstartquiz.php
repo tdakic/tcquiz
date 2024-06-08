@@ -95,7 +95,7 @@ list($newattemptid, $newsessid) = validate_and_start_teacher_tcq_attempt( $quizo
 
 $url = htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_students.php',
    ['sessionid' => $newsessid, 'joincode' => $joincode, 'cmid' => $id, 'quizid' => $quiz->id,
-    'attemptid' => $newattemptid,  'sesskey' => sesskey()]), ENT_NOQUOTES);
+    'attemptid' => $newattemptid]), ENT_NOQUOTES);
 
 header("Location: ". $url);
 die();
