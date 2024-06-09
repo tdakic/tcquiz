@@ -29,7 +29,7 @@ import Notification from 'core/notification';
 
 const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, POLLING_INTERVAL) => {
 
-  window.goToCurrentQuizPageEvent = setInterval(async() => {
+  document.goToCurrentQuizPageEvent = setInterval(async() => {
       await goToCurrentQuizPage(sessionid, quizid, cmid, attemptid, page);
   }, POLLING_INTERVAL);
 };
@@ -81,8 +81,8 @@ function updateQuizPage(responseXMLText) {
 
     if (quizstatus == 'showquestion') {
 
-        window.goToCurrentQuizPageEvent = null;
-        clearInterval(window.goToCurrentQuizPageEvent);
+        //document.goToCurrentQuizPageEvent = null;
+        clearInterval(document.goToCurrentQuizPageEvent);
         var attemptURL = quizresponse.getElementsByTagName('url').item(0).textContent;
         window.location.replace(attemptURL);
 
@@ -90,8 +90,8 @@ function updateQuizPage(responseXMLText) {
         // You should be on this page, so do nothing
     } else if (quizstatus == 'finalresults') {
 
-      window.goToCurrentQuizPageEvent = null;
-      clearInterval(window.goToCurrentQuizPageEvent);
+      //document.goToCurrentQuizPageEvent = null;
+      clearInterval(document.goToCurrentQuizPageEvent);
       var finalURL = quizresponse.getElementsByTagName('url').item(0).textContent;
       window.location.replace(finalURL);
 

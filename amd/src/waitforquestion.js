@@ -79,23 +79,26 @@ function updateQuizPage(responseXMLText) {
 
           if (quizstatus == 'showquestion') {
 
-            document.goToCurrentQuizPageEvent = null;
+            //document.goToCurrentQuizPageEvent = null;
             clearInterval(document.goToCurrentQuizPageEvent);
             var attemptURL = quizresponse.getElementsByTagName('url').item(0).textContent;
             window.location.replace(attemptURL);
 
           } else if (quizstatus == 'showresults') {
 
-            document.goToCurrentQuizPageEvent = null;
+            //document.goToCurrentQuizPageEvent = null;
             clearInterval(document.goToCurrentQuizPageEvent);
             resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
             window.location.replace(resultURL);
 
           } else if (quizstatus == 'finalresults') {
-             document.goToCurrentQuizPageEvent = null;
              clearInterval(document.goToCurrentQuizPageEvent);
+             //document.goToCurrentQuizPageEvent = null;
              resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
-             window.location.replace(resultURL);
+             setTimeout(() => {
+                window.location.replace(resultURL);
+             });
+
 
           } else if (quizstatus == 'quiznotrunning' || quizstatus == 'waitforquestion' || quizstatus == 'waitforresults' ||
                 quizstatus == 'noaction') {
