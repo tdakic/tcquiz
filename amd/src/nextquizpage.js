@@ -35,7 +35,7 @@ const registerEventListeners = (sessionid, quizid, cmid, attemptid, page) => {
   nextQuestionAction.addEventListener('click', async(e) => {
           e.preventDefault();
           // The page of the quiz attempt that will be displayed is detrmined by quizdatateacher.php.
-          // This is left here for possible error checking additions later
+          // This is left here for possible error checking additions later.
           page++;
 
           var result = await fetch(M.cfg.wwwroot

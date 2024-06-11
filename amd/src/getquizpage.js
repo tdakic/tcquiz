@@ -26,7 +26,6 @@
 import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
 
-
 const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, POLLING_INTERVAL) => {
 
   document.goToCurrentQuizPageEvent = setInterval(async() => {
@@ -56,7 +55,6 @@ async function goToCurrentQuizPage(sessionid, quizid, cmid, attemptid, page) {
 
 /**
  * Helper function to parse a response from the server and go to the specified url.
- * same function is in waitforquestion.js - leave for now in case more events added
  * @param {string} responseXMLText The XML returned by quizdatastudent.php
  */
 function updateQuizPage(responseXMLText) {
@@ -79,25 +77,20 @@ function updateQuizPage(responseXMLText) {
 
     var quizstatus = quizresponse.getElementsByTagName('status').item(0).textContent;
 
-    if (quizstatus == 'showquestion') {
+    // When results are being shown, the only options for the next page for students are
+    // show next question or show final results.
+    if (quizstatus == 'showquestion' || quizstatus == 'finalresults') {
 
-        //document.goToCurrentQuizPageEvent = null;
         clearInterval(document.goToCurrentQuizPageEvent);
-        var attemptURL = quizresponse.getElementsByTagName('url').item(0).textContent;
-        window.location.replace(attemptURL);
+        var nextURL = quizresponse.getElementsByTagName('url').item(0).textContent;
+        window.location.replace(nextURL);
 
     } else if (quizstatus == 'showresults') {
-        // You should be on this page, so do nothing
-    } else if (quizstatus == 'finalresults') {
-
-      //document.goToCurrentQuizPageEvent = null;
-      clearInterval(document.goToCurrentQuizPageEvent);
-      var finalURL = quizresponse.getElementsByTagName('url').item(0).textContent;
-      window.location.replace(finalURL);
+        // You should be on this page, so do nothing.
 
     } else if (quizstatus == 'quiznotrunning' || quizstatus == 'waitforquestion' || quizstatus == 'waitforresults' ||
             quizstatus == 'noaction') {
-            // Keep trying
+            // Keep trying.
 
     } else if (quizstatus == 'error') {
       var errmsg = quizresponse.getElementsByTagName('message').item(0).textContent;
@@ -116,7 +109,6 @@ function updateQuizPage(responseXMLText) {
   }
 
 }
-
 
 export const init = (sessionid, quizid, cmid, attemptid, page, POLLING_INTERVAL) => {
   registerEventListeners(sessionid, quizid, cmid, attemptid, page, POLLING_INTERVAL);

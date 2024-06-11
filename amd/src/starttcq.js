@@ -15,7 +15,6 @@
 
 /**
  * Allows the teacher to start tcquiz
- * Note that the $("#page-content") of the quiz view page is replaced by $("#starttcquizform")
  *
  * The actual form for typing in the new joincode and starting a new quiz is in
  * /mod/quiz/accessrule/tcquiz/classes/form/tcq_start_form.php
@@ -42,23 +41,6 @@ const Selectors = {
 
 const registerEventListeners = (sessionid, joincode, timestamp, currentpage, status, attemptid, existingsession, quizid, cmid) => {
 
-  /*  In 4.3 this works window.addEventListener('load', function(){
-
-        $("#page-content").html($("#starttcquizform"),false);
-
-      });
-
-      This works in both 4.3 and 4.4 but seem to cause issus for behat. I added an intermediary script
-      tcquiz_teacher_start_page.
-
-      if (document.readyState === "complete") {
-         $("#page-content").html($("#starttcquizform"), false);
-      } else {
-          window.addEventListener('load', function() {
-            $("#page-content").html($("#starttcquizform"), false);
-          });
-      }
-    */
     // Handle the teacher clicking on the End button to end the session (if there is one).
     const endTCQAction = document.querySelector(Selectors.actions.endButton);
     if (endTCQAction !== null) {
@@ -79,9 +61,11 @@ const registerEventListeners = (sessionid, joincode, timestamp, currentpage, sta
                   } else {
                     location.reload();
                   }
+                  return null;
           });
       }, {once: true});
     }
+
     // Handle the teacher clicking on the Rejoin button to rejoin the running session (if there is one).
     const rejoinTCQAction = document.querySelector(Selectors.actions.rejoinButton);
     if (endTCQAction !== null) {
@@ -94,19 +78,17 @@ const registerEventListeners = (sessionid, joincode, timestamp, currentpage, sta
             var url = "";
             if (status == tcqConsts.TCQUIZ_STATUS_READYTOSTART) {
               url = M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/wait_for_students.php?quizid=" + quizid + "&cmid=" + cmid +
-              "&attemptid=" + attemptid + "&joincode=" + joincode + "&sessionid=" + sessionid + "&sesskey=" + M.cfg.sesskey;
+              "&attemptid=" + attemptid + "&joincode=" + joincode + "&sessionid=" + sessionid;
               window.location.replace(url);
 
             } else if (status == tcqConsts.TCQUIZ_STATUS_PREVIEWQUESTION || status == tcqConsts.TCQUIZ_STATUS_SHOWQUESTION) {
               url = M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/attempt.php?showall=0&quizid=" + quizid + "&cmid=" + cmid +
-              "&attempt=" + attemptid + "&joincode" + joincode + "&sessionid=" + sessionid + "&page=" + currentpage +
-              "&sesskey=" + M.cfg.sesskey;
+              "&attempt=" + attemptid + "&joincode" + joincode + "&sessionid=" + sessionid + "&page=" + currentpage;
               window.location.replace(url);
 
             } else if (status == tcqConsts.TCQUIZ_STATUS_SHOWRESULTS) {
               url = M.cfg.wwwroot + "/mod/quiz/accessrule/tcquiz/review_tcq.php?showall=false&quizid=" + quizid + "&cmid=" +
-              cmid + "&attempt=" + attemptid + "&joincode" + joincode + "&sessionid=" + sessionid + "&page=" + currentpage +
-              "&sesskey=" + M.cfg.sesskey;
+              cmid + "&attempt=" + attemptid + "&joincode" + joincode + "&sessionid=" + sessionid + "&page=" + currentpage;
               window.location.replace(url);
 
             } else if (status == tcqConsts.TCQUIZ_STATUS_FINALRESULTS) {

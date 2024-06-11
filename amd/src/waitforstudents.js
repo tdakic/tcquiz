@@ -15,7 +15,7 @@
 
 /**
  * Wait for the students to connect to tcquiz session.
- * Redisplay the number of connected students every POLLING_INTERVAL miliiseconds
+ * Redisplay the number of connected students every POLLING_INTERVAL miliiseconds.
  *
  * @module     quizaccess_tcquiz
  * @copyright  2024 Capilano University
@@ -38,12 +38,11 @@ const registerEventListeners = (sessionid, quizid, cmid, attemptid, POLLING_INTE
     await updateNumberOfStudents(sessionid, quizid, cmid, attemptid);
   }, POLLING_INTERVAL);
 
-  /* Teacher clicks the next button when they are ready to display the first question */
+  /* Teacher clicks the next button when they are ready to display the first question. */
   const nextQuestionAction = document.querySelector(Selectors.actions.nextButton);
   nextQuestionAction.addEventListener('click', async(e) => {
           e.preventDefault();
           clearInterval(updateNumStudentsEvent);
-          updateNumStudentsEvent = null;
 
           var result = await fetch(M.cfg.wwwroot + '/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getquestion&quizid='
             + quizid + '&cmid=' + cmid + '&attempt=' + attemptid
@@ -56,12 +55,6 @@ const registerEventListeners = (sessionid, quizid, cmid, attemptid, POLLING_INTE
     }, {once: true});
 
 };
-
-
-export const init = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
-  registerEventListeners(sessionid, quizid, cmid, attemptid, POLLING_INTERVAL);
-};
-
 
 /**
  * Update the number of students who connected to tcquiz
@@ -79,7 +72,6 @@ async function updateNumberOfStudents(sessionid, quizid, cmid, attemptid) {
   var responseXMLText = await result.text();
 
   await updateNumberOfStudentsHTML(responseXMLText);
-
 }
 
 /**
@@ -101,7 +93,7 @@ function updateNumberOfStudentsHTML(responseXMLText) {
 /**
  * Helper function to parse a response from the server and go to the specified url.
  * The url should either be of the next quiz page of the final results.
- * The only responses should have url field
+ * The only responses should have the url field.
  * @param {string} responseXMLText The XML returned by quizdatateacher.php
  */
 function goToNextUrl(responseXMLText) {
@@ -113,5 +105,8 @@ function goToNextUrl(responseXMLText) {
 
   var nextUrl = quizresponse.getElementsByTagName('url').item(0).textContent;
   window.location.replace(nextUrl);
-
 }
+
+export const init = (sessionid, quizid, cmid, attemptid, POLLING_INTERVAL) => {
+  registerEventListeners(sessionid, quizid, cmid, attemptid, POLLING_INTERVAL);
+};

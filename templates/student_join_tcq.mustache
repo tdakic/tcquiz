@@ -25,7 +25,7 @@
     "cmid"     - cmid of this quiz
     "formhtml" - rendered from /mod/quiz/accessrule/tcquiz/classes/form/tcq_student_join_form.php
                   contains an input field for joincode and a submit button
-      
+
     Example context (json):
     {
       "quizid": 12345,
@@ -39,7 +39,3 @@
 {{{formhtml}}}
 <p> {{#str}} joininstruct, quizaccess_tcquiz  {{/str}}
 </div>
-
-{{#js}}
-require(['quizaccess_tcquiz/studentjointcq'], (module) => module.init('{{quizid}}', '{{cmid}}'));
-{{/js}}

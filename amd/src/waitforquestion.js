@@ -15,7 +15,7 @@
 
 /**
  * Redirects a student to the current quiz page. Used when the student
- * joins the quiz.
+ * joins the quiz at the start time or late.
  *
  * @module     quizaccess_tcquiz
  * @copyright  2024 Capilano University
@@ -64,7 +64,6 @@ function updateQuizPage(responseXMLText) {
         const responseXML = parser.parseFromString(responseXMLText, 'text/html');
 
         var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
-        var resultURL;
 
         if (quizresponse === null) {
             Notification.addNotification({
@@ -77,28 +76,11 @@ function updateQuizPage(responseXMLText) {
 
           var quizstatus = quizresponse.getElementsByTagName('status').item(0).textContent;
 
-          if (quizstatus == 'showquestion') {
+          if (quizstatus == 'showquestion' || quizstatus == 'showresults' || quizstatus == 'finalresults') {
 
-            //document.goToCurrentQuizPageEvent = null;
             clearInterval(document.goToCurrentQuizPageEvent);
-            var attemptURL = quizresponse.getElementsByTagName('url').item(0).textContent;
-            window.location.replace(attemptURL);
-
-          } else if (quizstatus == 'showresults') {
-
-            //document.goToCurrentQuizPageEvent = null;
-            clearInterval(document.goToCurrentQuizPageEvent);
-            resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
-            window.location.replace(resultURL);
-
-          } else if (quizstatus == 'finalresults') {
-             clearInterval(document.goToCurrentQuizPageEvent);
-             //document.goToCurrentQuizPageEvent = null;
-             resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
-             setTimeout(() => {
-                window.location.replace(resultURL);
-             });
-
+            var nextURL = quizresponse.getElementsByTagName('url').item(0).textContent;
+            window.location.replace(nextURL);
 
           } else if (quizstatus == 'quiznotrunning' || quizstatus == 'waitforquestion' || quizstatus == 'waitforresults' ||
                 quizstatus == 'noaction') {

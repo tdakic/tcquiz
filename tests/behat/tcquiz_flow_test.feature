@@ -169,7 +169,7 @@ Feature: Test that the teacher can control a flow of a TCQuiz.
     And I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "teachercode4"
     When I click on "Join quiz" "button"
     Then "Done" "button" should be visible
-    #And I should see "Your score is 1.00 / 2."
+    And I should see "Your score is 1.00 / 2."
     #And I wait 5 seconds for "Your score is 1.00 / 2." to appear
     When I click on "Done" "button"
     Then I should see "Wait until your teacher gives you the code."

@@ -145,7 +145,8 @@ function updateNumAnswersHtml(responseXMLText) {
  * Helper function to replace the current page with the attempt page specified in the responseXMLText
  * @param {string} responseXMLText
  */
-/* For when the teacher controls are improved function parse_next_url(responseXMLText){
+/* For when the teacher controls are improved and the Next button is also on this page.
+ function parse_next_url(responseXMLText){
 
   var parser = new DOMParser();
   var responseXML = parser.parseFromString(responseXMLText, 'text/html');

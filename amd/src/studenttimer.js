@@ -34,7 +34,7 @@ const Selectors = {
 
 const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL) => {
 // The timer can be stoped either by the teacher or expired time -- handle both events.
-// Enough to check when the state of the quiz has changed to show results (30)
+// Enough to check when the state of the quiz has changed to show results (30).
 
     $('#responseform').on('submit', function() {
         $('#responseformsubmit').attr('disabled', 'disabled');
@@ -56,19 +56,20 @@ const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, timeFo
         timeLeftHTML.innerHTML = timeLeft;
         if (timeLeft <= 0 || teacherEndedQuestion) {
           clearInterval(timer);
-          clearInterval(tecaherEndedQuestionEvent);
           timer = null;
+          clearInterval(tecaherEndedQuestionEvent);
+          tecaherEndedQuestionEvent = null;
           timeLeftHTML.innerHTML = 0;
-          window.goToCurrentQuizPageEvent = setInterval(async() => {
+          document.goToCurrentQuizPageEvent = setInterval(async() => {
               await goToCurrentQuizPage(sessionid, quizid, cmid, attemptid);
           }, POLLING_INTERVAL);
         }
     }, 1000);
 
     // Checks for teacher ending the question event.
-    const tecaherEndedQuestionEvent = setInterval(async function() {
+    var tecaherEndedQuestionEvent = setInterval(async function() {
       teacherEndedQuestion = await checkQuestionState(sessionid, quizid, cmid, attemptid);
-    }, POLLING_INTERVAL); // 1000 means 1 sec, 5000 means 5 seconds
+    }, POLLING_INTERVAL); // 1000 means 1 sec
 
 };
 
@@ -125,8 +126,6 @@ function updateQuizPage(responseXMLText) {
 
   var quizresponse = responseXML.getElementsByTagName('tcquiz').item(0);
 
-  // ERROR handling?
-
   if (quizresponse === null) {
     Notification.addNotification({
         message: getString('invalidserverresponse', 'quizaccess_tcquiz'),
@@ -144,15 +143,18 @@ function updateQuizPage(responseXMLText) {
 
     } else if (quizstatus == 'showresults') {
 
-        window.goToCurrentQuizPageEvent = null;
-        clearInterval(window.goToCurrentQuizPageEvent);
+        clearInterval(document.goToCurrentQuizPageEvent);
+        document.goToCurrentQuizPageEvent = null;
         var resultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
         window.location.replace(resultURL);
 
     } else if (quizstatus == 'finalresults') {
+      // This could potentially only happen if the teacher clicks through the question results very fast.
 
-      window.goToCurrentQuizPageEvent = null;
-      clearInterval(window.goToCurrentQuizPageEvent);
+      clearInterval(document.goToCurrentQuizPageEvent);
+      document.goToCurrentQuizPageEvent = null;
+      var finalResultURL = quizresponse.getElementsByTagName('url').item(0).textContent;
+      window.location.replace(finalResultURL);
 
     } else if (quizstatus == 'quiznotrunning' || quizstatus == 'waitforquestion' || quizstatus == 'waitforresults'
             || quizstatus == 'noaction') {
