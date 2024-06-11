@@ -61,7 +61,7 @@ $PAGE->set_cacheable(false);
 
 // Check login and sesskey.
 require_login($quizobj->get_course(), false, $quizobj->get_cm());
-//require_sesskey();
+require_sesskey();
 
 // If no questions have been set up yet redirect to edit.php or display an error.
 if (!$quizobj->has_questions()) {

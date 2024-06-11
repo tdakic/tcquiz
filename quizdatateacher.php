@@ -28,14 +28,13 @@ define('AJAX_SCRIPT', true);
 use quizaccess_tcquiz\tcquiz_attempt;
 
 require_once('../../../../config.php');
+require_login();
+
 global $CFG, $DB, $USER, $PAGE;
 
 require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/locallib.php');
 require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 require_once($CFG->libdir.'/filelib.php');
-
-require_login();
-require_sesskey();
 
 $requesttype = required_param('requesttype', PARAM_ALPHA);
 $quizid = required_param('quizid', PARAM_INT);
@@ -45,9 +44,8 @@ $sessionid = required_param('sessionid', PARAM_INT);
 
 // In case the user crashed.
 if (!confirm_sesskey()) {
-  redirect(new \moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]));
+    redirect(new \moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]));
 }
-
 
 /***********************************************************
  * start of main code

@@ -23,8 +23,6 @@
  */
 namespace quizaccess_tcquiz;
 
-//use quizaccess_tcquiz\output\renderer;
-//use quizaccess_tcquiz\tcquiz_attempt;
 use mod_quiz\quiz_settings;
 
 require_once(__DIR__ . '/../../../../config.php');
@@ -33,8 +31,6 @@ global $CFG, $PAGE, $USER;
 require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/tcquiz/locallib.php');
 require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/classes/form/tcq_student_join_form.php');
-
-//require_sesskey();
 
 // Get submitted parameters.
 $cmid = required_param('id', PARAM_INT);

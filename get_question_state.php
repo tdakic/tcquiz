@@ -31,7 +31,6 @@ require_login();
 global $DB, $PAGE;
 
 $PAGE->set_cacheable(false);
-//$PAGE->set_url($CFG->wwwroot.$SCRIPT);
 
 $sessionid = required_param('sessionid', PARAM_INT);
 $attemptid = required_param('attempt', PARAM_INT);
@@ -43,14 +42,8 @@ $cmid = required_param('cmid', PARAM_INT);
 
 // In case the user crashed.
 if (!confirm_sesskey()) {
-  //echo "Redirected + ";
-  //echo new \new moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]);
-  //die();
-  redirect(new \moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]));
+    redirect(new \moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]));
 }
-
-//$url = new moodle_url('/mod/quiz/view.php', ['id' => '32']);
-//$PAGE->set_url($url);
 
 $session = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid]);
 

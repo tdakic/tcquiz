@@ -63,8 +63,8 @@ class behat_quizaccess_tcquiz extends behat_base {
      *
      * @When I wait :seconds second(s) for :text to appear
      *
-     * @param $seconds
-     * @param $text
+     * @param int $seconds
+     * @param int $text
      * @throws ResponseTextException
      */
     public function i_wait_for_text_to_appear($seconds, $text) {
@@ -76,7 +76,7 @@ class behat_quizaccess_tcquiz extends behat_base {
 
         do {
             try {
-                $node = $this->getSession()->getPage()->find("named", array("content", $text));
+                $node = $this->getSession()->getPage()->find("named", ["content", $text]);
                 if ($node) {
                     return true;
                 }

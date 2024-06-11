@@ -17,8 +17,7 @@
 use mod_quiz\quiz_settings;
 
 require_once(__DIR__ . '/../../../../config.php');
-//require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/classes/form/tcq_start_form.php');
-//require_once($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/classes/form/tcq_student_join_form.php');
+require_login();
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -173,12 +172,9 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
               [] ];
     }
 
-
     /**
      * This method basically hijacks the mod_quiz/view page to display the tcq starting
-     * forms for students and the teacher. Note that there is a js in starttcq.js and
-     * studentjointcq.js that replaces #page-content with the (student or teacher) form created here.
-     * Also note that the form validation is done through moodle mform.
+     * forms for students and the teacher.
      *
      * @return a message that includes tcq starting
      * forms for students and the teacher
@@ -202,52 +198,11 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
                 redirect(new \moodle_url('/mod/quiz/accessrule/tcquiz/tcq_teacher_start_page.php', ['id' => $this->quiz->cmid]));
                 die();
 
-                /* if (!$sessdata = self::get_open_session($context)) {
-                    $existingsession = false;
-                    $sessdata = ['sessionid' => 0, 'joincode' => '', 'timestamp' => null, 'currentpage' => 0,
-                                  'status' => 0, 'attemptid' => 0 ];
-                } else {
-                    $existingsession = true;
-                }
-
-                $mform = new tcq_start_form(customdata:['cmid' => $this->quiz->cmid, 'quizid' => $this->quiz->id ]);
-
-                if ($fromform = $mform->get_data()) { // Form is validated.
-
-                    $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/teacherstartquiz.php',
-                        ['joincode' => $fromform->joincode, 'cmid' => $this->quiz->cmid, 'quizid' => $this->quiz->id,
-                          'sesskey' => sesskey()]), ENT_NOQUOTES);
-
-                    header("Location: ". $url);
-                    die();
-                }
-
-                $messages[] = $OUTPUT->render_from_template('quizaccess_tcquiz/start_tcq', ['sessionid' => $sessdata['sessionid'],
-                    'joincode' => $sessdata['joincode'], 'timestamp' => $sessdata['timestamp'],
-                    'currentpage' => $sessdata['currentpage'],
-                    'status' => $sessdata['status'], 'attemptid' => $sessdata['attemptid'],
-                    'existingsession' => $existingsession, 'quizid' => $this->quiz->id, 'cmid' => $this->quiz->cmid,
-                    'formhtml' => $mform->render()]); */
-
             } else {
 
                 redirect(new \moodle_url('/mod/quiz/accessrule/tcquiz/tcq_student_start_page.php', ['id' => $this->quiz->cmid]));
                 die();
 
-                /* $mform = new tcq_student_join_form(customdata:['cmid' => $this->quiz->cmid, 'quizid' => $this->quiz->id ]);
-
-                if ($fromform = $mform->get_data()) { // Form validated.
-
-                    $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/startattemptstudent.php',
-                        ['joincode' => $fromform->joincode, 'cmid' => $this->quiz->cmid, 'quizid' => $this->quiz->id,
-                          'sesskey' => sesskey()]), ENT_NOQUOTES);
-
-                    header("Location: ". $url);
-                    die();
-                }
-
-                $messages[] = $OUTPUT->render_from_template('quizaccess_tcquiz/student_join_tcq', [
-                  'quizid' => $this->quiz->id, 'cmid' => $this->quiz->cmid, 'formhtml' => $mform->render()]); */
             }
         }
         return $messages;
@@ -303,49 +258,4 @@ class quizaccess_tcquiz extends quizaccess_tcquiz_parent_class_alias {
         }
         return $messages;
     }
-
-    /**
-     * Moved to locallib.php - not needed here
-     * Return the list with information of the tcquiz session that is currently running
-     * @param context_module $context the quiz context.
-     * @return array('sessionid', 'joincode', 'timestamp', 'currentpage', 'status',  'attemptid');
-     */
-    private function get_open_session($context): array {
-
-        global $DB;
-        global $USER;
-        global $CFG;
-
-        // Get the constant from the file.
-        $json = file_get_contents($CFG->dirroot.'/mod/quiz/accessrule/tcquiz/tcq_constants.json');
-        $constdata = json_decode($json, true);
-
-        foreach ($constdata as $key => $value) {
-            define($key, $value);
-        }
-        // Display a table of the session that is in progress (status between 10-40 inclusive).
-        // Should be only one if the housekeeping is done right.
-
-        // Check to see if an open attempt of the teacher is a tcquiz attempt.
-        $sql = "SELECT * FROM {quizaccess_tcquiz_attempt} qta
-                        LEFT JOIN {quiz_attempts} qa ON qta.attemptid = qa.id
-                        WHERE qa.state = 'inprogress' AND qa.quiz = :quizid AND qa.userid = :uid";
-
-        if (!$attempt = $DB->get_record_sql($sql, ['quizid' => $this->quiz->id, 'uid' => $USER->id])) {
-            return [];
-        } else {
-            // Get the session assocaited with the teacher's attempt and return its data.
-            // Status should be between 10 (TCQUIZ_STATUS_READYTOSTART) and 40 (TCQUIZ_STATUS_FINALRESULTS).
-            $sql = "SELECT * FROM {quizaccess_tcquiz_session} WHERE id = :sessid AND status BETWEEN :running and :results";
-            if (!$sess = $DB->get_record_sql($sql, ['sessid' => $attempt->sessionid, 'running' => TCQUIZ_STATUS_READYTOSTART,
-                'results' => TCQUIZ_STATUS_FINALRESULTS])) {
-                return [];
-            } else {
-                return ['sessionid' => $sess->id, 'joincode' => $sess->joincode,
-                  'timestamp' => date('m/d/Y H:i:s', $sess->timestamp), 'currentpage' => $sess->currentpage,
-                  'status' => $sess->status, 'attemptid' => $attempt->id];
-            }
-        }
-    }
-
 }

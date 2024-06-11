@@ -42,11 +42,6 @@ $cmid = required_param('cmid', PARAM_INT);
 $quizid = optional_param('quizid', 0, PARAM_INT);
 $sessionid = required_param('tcqsid', PARAM_INT);
 
-// In case the user crashed.
-/*if (!confirm_sesskey()) {
-  redirect(new \moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]));
-}*/
-
 try {
     $attemptobj = tcquiz_attempt::create($attemptid);
 } catch (moodle_exception $e) {

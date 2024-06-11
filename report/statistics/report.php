@@ -250,7 +250,6 @@ class tcquiz_statistics_report extends quiz_statistics_report {
             $progress = new \core\progress\none();
         }
 
-
         $whichattempts = QUIZ_ATTEMPTLAST;  // Hack to get rid of the unassigned whichattempts in using_attempts_string_id.
         $qubaids = tcquiz_statistics_qubaids_condition($quiz->id, $sessionid, $groupstudentsjoins, $whichattempts);
 

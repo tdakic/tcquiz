@@ -23,8 +23,6 @@
  */
 namespace quizaccess_tcquiz;
 
-//use quizaccess_tcquiz\output\renderer;
-//use quizaccess_tcquiz\tcquiz_attempt;
 use mod_quiz\quiz_settings;
 
 require_once(__DIR__ . '/../../../../config.php');
@@ -56,7 +54,6 @@ $PAGE->set_cacheable(false);
 
 $PAGE->set_title($SITE->fullname);
 $PAGE->add_body_class('limitedwidth');
-
 
 // Check the access rules.
 $accessmanager = $quizobj->get_access_manager(time());

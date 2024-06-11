@@ -33,7 +33,6 @@ require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 require_once($CFG->libdir.'/filelib.php');
 
 require_login();
-require_sesskey();
 
 $quizid = required_param('quizid', PARAM_INT);
 $attempt = required_param('attempt', PARAM_INT );
@@ -42,7 +41,7 @@ $sessionid = required_param('sessionid', PARAM_INT);
 
 // In case the user crashed.
 if (!confirm_sesskey()) {
-  redirect(new \moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]));
+    redirect(new \moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]));
 }
 
 
@@ -51,37 +50,7 @@ if (!confirm_sesskey()) {
  ***********************************************************/
 
 tcquiz_start_response();
-/* these are checked in the urls that this script returns
-   because of polling this might add up a big load to the server
-if (!$quiz = $DB->get_record("quiz", array('id' => $quizid))) {
-    tcquiz_send_error("Quiz ID incorrect");
-    tcquiz_end_response();
-    die();
-}
-if (!$course = $DB->get_record("course", array('id' => $quiz->course))) {
-    tcquiz_send_error("Course is misconfigured");
-    tcquiz_end_response();
-    die();
-}
-if (!$cm = get_coursemodule_from_instance("quiz", $quiz->id, $course->id)) {
-    tcquiz_send_error("Course Module ID was incorrect");
-    tcquiz_end_response();
-    die();
-}
 
-if ($CFG->version < 2011120100) {
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-} else {
-    $context = context_module::instance($cm->id);
-}
-$PAGE->set_context($context);
-
-if (!has_capability('mod/quiz:attempt', $context)) {
-    tcquiz_send_error(get_string('notallowedattempt', 'tcquiz'));
-    tcquiz_end_response();
-    die();
-}
-*/
 if (!$tcquiz = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid])) {
     tcquiz_send_error("TCQuiz Session incorrect");
     tcquiz_end_response();
@@ -111,8 +80,8 @@ if ($status === false) {
 
             echo '<status>showquestion</status>';
             echo '<url>';
-            echo new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php', ['r' => rand(), 'page' => $tcquiz->currentpage, 'showall' => false,
-              'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id]);
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php', ['r' => rand(), 'page' => $tcquiz->currentpage,
+              'showall' => false, 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id]);
             echo '</url>';
             break;
 
@@ -120,8 +89,8 @@ if ($status === false) {
 
             echo '<status>showresults</status>';
             echo '<url>';
-            echo new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php', ['r' => rand(), 'page' => $tcquiz->currentpage, 'showall' => 'false',
-              'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id]);
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php', ['r' => rand(), 'page' => $tcquiz->currentpage,
+              'showall' => 'false', 'attempt' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'sessionid' => $tcquiz->id]);
             echo '</url>';
             break;
 
@@ -132,8 +101,8 @@ if ($status === false) {
 
             echo '<status>finalresults</status>';
             echo '<url>';
-            echo new moodle_url('/mod/quiz/accessrule/tcquiz/report_student_final_results.php', ['r' => rand(), 'attemptid' => $attempt,
-              'quizid' => $quizid, 'cmid' => $cmid, 'tcqsid' => $sessionid]);
+            echo new moodle_url('/mod/quiz/accessrule/tcquiz/report_student_final_results.php', ['r' => rand(),
+              'attemptid' => $attempt, 'quizid' => $quizid, 'cmid' => $cmid, 'tcqsid' => $sessionid]);
             echo '</url>';
             break;
 

@@ -31,7 +31,11 @@ require_once(__DIR__ . '/../../../../config.php');
 global $DB, $USER;
 
 require_login();
-require_sesskey();
+
+// In case the user crashed.
+if (!confirm_sesskey()) {
+    redirect(new \moodle_url('/mod/quiz/view.php', ['id' => $cmid, 'forceview' => 1]));
+}
 
 $sessionid = required_param('sessionid', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);

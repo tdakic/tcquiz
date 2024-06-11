@@ -37,9 +37,8 @@ $attemptid = required_param('attemptid', PARAM_INT );
 $sessionid = required_param('sessionid', PARAM_INT);
 
 $quizobj = quiz_settings::create_for_cmid($cmid, $USER->id);
-// Check login and sesskey.
+// Check login.
 require_login($quizobj->get_course(), false, $quizobj->get_cm());
-//require_sesskey();
 
 $context = $quizobj->get_context();
 require_capability('mod/quiz:manage', $context);
