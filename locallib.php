@@ -229,7 +229,7 @@ function setup_tcquiz_attempt($quizobj, $session, $currentattemptid, $joincode, 
     global $DB;
 
     /*  If $currentattemptid exists, there is an open student attempt. If that attempt doesn't correspond to the one with the
-        joincode close it, else return the currentattemptid */
+        joincode close it, else return the currentattemptid. */
 
     if ($currentattemptid) {
         // Need to check if the currentattemptid is in quizaccess_tcquiz_attempt.

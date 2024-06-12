@@ -109,7 +109,15 @@ if (!$quizobj->is_preview_user() && $messages) {
 // quiz attempt with the TCQ attempt and TCQ session and returns its id.
 // PRE: $joincode is a code of running TCQ session.
 
-$attemptid = setup_tcquiz_attempt($quizobj, $session, $currentattemptid, $joincode, $accessmanager, $attemptnumber, $lastattempt);
+// It could happen that when TCQuiz in in state TCQUIZ_STATUS_FINALRESULTS that the student attempt is already finished.
+// In that case do not create a new attempt!
+
+if ($session->status == TCQUIZ_STATUS_FINALRESULTS && !$currentattemptid) {
+    $attemptid = $lastattempt->id;
+} else {
+    $attemptid = setup_tcquiz_attempt($quizobj, $session, $currentattemptid, $joincode, $accessmanager,
+                                      $attemptnumber, $lastattempt);
+}
 
 $url = htmlspecialchars_decode(new \moodle_url('/mod/quiz/accessrule/tcquiz/wait_for_question.php',
   ['sessionid' => $session->id, 'cmid' => $id, 'quizid' => $quiz->id,
