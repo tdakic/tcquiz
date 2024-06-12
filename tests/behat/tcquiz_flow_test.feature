@@ -32,8 +32,8 @@ Feature: Test that the teacher can control a flow of a TCQuiz.
       | TF2      | 2    |  1      |
 
   @javascript
-  Scenario: Teacher creates a TCQuiz, starts it and displays the first question. The student joins the quiz
-  and should see the first question.
+  Scenario: Teacher creates a TCQuiz, starts it and administers it. The student joins the quiz
+  and answers the question as they are posed by the teacher.
     # The above background doesn't seem to set the quiz to be a TCQuiz, so here it goes.
     When I am on the "Quiz 1" "quiz activity editing" page logged in as "teacher"
     And I expand all fieldsets
@@ -148,7 +148,7 @@ Feature: Test that the teacher can control a flow of a TCQuiz.
     And I should see "Incorrect"
     And I log out
 
-    # The teacher clicks next to display the final results.
+    # The teacher clicks Next to display the final results.
     When I am on the "Quiz 1" "mod_quiz > View" page logged in as "teacher"
     Then "Rejoin" "button" should be visible
     And I should see "teachercode4"
@@ -157,7 +157,7 @@ Feature: Test that the teacher can control a flow of a TCQuiz.
     And I should see "Analysis of responses"
     And "Next >>" "button" should be visible
     When I click on "Next >>" "button"
-    #Then I should see "Overall number of students achieving grade ranges" - fails???
+    Then I should see "Overall number of students achieving grade ranges"
     And I should see "Attempts: 1"
     And I log out
 
@@ -170,7 +170,6 @@ Feature: Test that the teacher can control a flow of a TCQuiz.
     When I click on "Join quiz" "button"
     Then "Done" "button" should be visible
     And I should see "Your score is 1.00 / 2."
-    #And I wait 5 seconds for "Your score is 1.00 / 2." to appear
     When I click on "Done" "button"
     Then I should see "Wait until your teacher gives you the code."
     And I log out
