@@ -117,6 +117,6 @@ const registerEventListeners = (sessionid, joincode, timestamp, currentpage, sta
 
 export const init = (sessionid, joincode, timestamp, currentpage, status, attemptid, existingsession, quizid, cmid) => {
 
-  registerEventListeners(sessionid, joincode, timestamp, currentpage, status, attemptid, existingsession, quizid, cmid);
+  registerEventListeners(sessionid, joincode, timestamp, currentpage - 1, status, attemptid, existingsession, quizid, cmid);
 
 };

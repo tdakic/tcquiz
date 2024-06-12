@@ -37,7 +37,7 @@ class tcquiz_overview_report extends \quiz_overview_report {
      * @param int $sessionid - the id of a tcqsession
      */
     public function tcq_display_final_graph($quiz, $cm, $course, $sessionid) {
-        global $DB, $PAGE;
+        global $DB, $PAGE, $OUTPUT;
 
         list($currentgroup, $studentsjoins, $groupstudentsjoins, $allowedjoins) = $this->init(
                 'overview', 'quiz_overview_settings_form', $quiz, $cm, $course);

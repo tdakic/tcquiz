@@ -45,23 +45,23 @@ Feature: Test that the teacher can rejoin the quiz and be on the right page.
     And I set the field with xpath "//input[@type='text' and @id='id_joincode']" to "teachercode7"
     When I click on "Start new quiz session" "button"
     Then I should see "Waiting for students to connect"
+    And I log out
 
     # Assume the teacher crashed and they want to reconnect.
-    When I am on the "Quiz 2" "mod_quiz > View" page
+    When I am on the "Quiz 2" "mod_quiz > View" page logged in as "teacher"
     Then "Rejoin" "button" should be visible
     And I should see "teachercode7"
     When I click on "Rejoin" "button"
     Then I should see "Waiting for students to connect"
     And "Next >>" "button" should be visible
 
-
     # Display the first question.
     When I click on "Next >>" "button"
     Then I should see "Text of the first question"
+    And I log out
 
     # Crash again - but this time the teacher should reconnect to question
-    When I am on the "Quiz 2" "mod_quiz > View" page
-    # When I follow "Quiz"
+    When I am on the "Quiz 2" "mod_quiz > View" page logged in as "teacher"
     Then "Rejoin" "button" should be visible
     And I should see "teachercode7"
     When I click on "Rejoin" "button"
@@ -73,8 +73,9 @@ Feature: Test that the teacher can rejoin the quiz and be on the right page.
     # The answer to the first question is displayed
     Then I should see "Text of the first question"
     And I should see "The correct answer is 'True'"
+    And I log out
     # Crash.
-    When I am on the "Quiz 2" "mod_quiz > View" page
+    When I am on the "Quiz 2" "mod_quiz > View" page logged in as "teacher"
     Then "Rejoin" "button" should be visible
     And I should see "teachercode7"
     When I click on "Rejoin" "button"
@@ -83,13 +84,14 @@ Feature: Test that the teacher can rejoin the quiz and be on the right page.
     And I should see "The correct answer is 'True'"
 
     # This should take the teacher to the final results.
-    # There is only one question in the quiz
+    # There is only one question in the quiz.
     When I click on "Next >>" "button"
     Then I should see "Attempts: 0"
     And "End quiz" "button" should be visible
+    And I log out
 
     # Crash.
-    When I am on the "Quiz 2" "mod_quiz > View" page
+    When I am on the "Quiz 2" "mod_quiz > View" page logged in as "teacher"
     Then "Rejoin" "button" should be visible
     And I should see "teachercode7"
     When I click on "Rejoin" "button"

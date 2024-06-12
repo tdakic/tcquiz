@@ -90,10 +90,10 @@ if ($fromform = $mform->get_data()) { // Form is validated.
 }
 
 echo $output->header();
-
+// Note that one was added to the current page, as most people count from 1.
 echo $OUTPUT->render_from_template('quizaccess_tcquiz/start_tcq', ['sessionid' => $sessdata['sessionid'],
     'joincode' => $sessdata['joincode'], 'timestamp' => $sessdata['timestamp'],
-    'currentpage' => $sessdata['currentpage'],
+    'currentpage' => $sessdata['currentpage'] + 1,
     'status' => $sessdata['status'], 'attemptid' => $sessdata['attemptid'],
     'existingsession' => $existingsession, 'quizid' => $quizid, 'cmid' => $cmid,
     'formhtml' => $mform->render()]);

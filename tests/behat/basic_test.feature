@@ -33,9 +33,9 @@ Feature: Test the basic functionality of the TCQuiz access rule
     And I am on the "Not a TCQuiz " "mod_quiz > View" page logged in as "student"
     When I press "Attempt quiz"
     Then I should see "Question 1"
+    And I log out
 
-    # Add a TCQuiz to a course, and verify that the student can't see the questions.
-    When I log out
+  Scenario: Start a TCQuiz quiz, and make sure that both teacher and student land on their respective tcq start page.
     Given I am on the "Course 1" "Course" page logged in as "teacher"
     And I turn editing mode on
     And I add a "Quiz" to section "1" and I fill the form with:
@@ -48,21 +48,29 @@ Feature: Test the basic functionality of the TCQuiz access rule
       | Question text                      | Is this the first question? |
       | Correct answer                     | True                        |
     And I am on the "TCQuiz" "mod_quiz > View" page
-    # As a teacher the TCQ start screen should be displayed.
+    # For a teacher, the TCQ start page should be displayed.
     Then I should see "Start new quiz session"
     When I log out
+    # For a student, their TCQ start page should be displayed.
     And I am on the "TCQuiz" "mod_quiz > View" page logged in as "student"
     Then I should see "Wait until your teacher gives you the code."
     And "Join quiz" "button" should be visible
 
-    # Test that backup and restore keeps the settings.
-    When I log out
+  Scenario: Create a copy of a TCQuiz and make sure that the TCQ settings are copied over.
+    # This should test that backup and restore keeps the settings?
+    Given I am on the "Course 1" "Course" page logged in as "teacher"
+    And I turn editing mode on
+    And I add a "Quiz" to section "1" and I fill the form with:
+      | Name                  | TCQuizToCopy                        |
+      | Description           | This quiz is a TCQuiz         |
+      | Administer TCQuiz     | Yes                           |
+      | Default question time | 55                            |
     And I am on the "Course 1" "Course" page logged in as "teacher"
     And I turn editing mode on
-    And I duplicate "TCQuiz" activity editing the new copy with:
+    And I duplicate "TCQuizToCopy" activity editing the new copy with:
       | Name | TCQuiz1 |
     And I am on the "TCQuiz1" "quiz activity editing" page
     And I expand all fieldsets
     Then the "Administer TCQuiz" select box should contain "Yes"
-    And the field "Default question time" matches value "30"
+    And the field "questiontime" matches value "55"
     And I log out

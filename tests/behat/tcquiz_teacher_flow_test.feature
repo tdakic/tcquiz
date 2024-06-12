@@ -1,5 +1,5 @@
 @quizaccess @quizaccess_tcquiz @javascript
-Feature: Test that the teacher can control a flow of a TCQuiz.
+Feature: Test that the teacher can control the flow of a TCQuiz.
   In order to administer a TCQuiz
   As an teacher
   I need to be able to control its flow.
@@ -23,7 +23,7 @@ Feature: Test that the teacher can control a flow of a TCQuiz.
       | Test questions   | truefalse   | TF2   | Text of the second question | False          |
     And the following "activities" exist:
         | activity | name   | intro              | course | idnumber | grade | navmethod  | tcqrequired | questiontime |
-        | quiz     | Quiz 2 | Quiz 2 description | C1     | quiz1    | 100   | free       | 1           | 20          |
+        | quiz     | Quiz 2 | Quiz 2 description | C1     | quiz2    | 100   | free       | Yes         | 20           |
     And quiz "Quiz 2" contains the following questions:
       | question | page | maxmark |
       | TF1      | 1    |         |
@@ -61,12 +61,9 @@ Feature: Test that the teacher can control a flow of a TCQuiz.
     # The second question is displayed
     Then I should see "Text of the second question"
     And I wait 25 seconds for "The correct answer" to appear
-    #And I wait 25 seconds - didn't work
-    #And I wait for the page to be loaded - didn't work
 
     # The answer to the second question is displayed
     Then I should see "Text of the second question"
-    # And I should see "The correct answer is 'False'" - seems that behat thinks the answer is True
     And "Next >>" "button" should be visible
     When I click on "Next >>" "button"
 
