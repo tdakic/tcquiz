@@ -42,32 +42,27 @@ Feature: Test the basic functionality of the TCQuiz access rule
       | Name                  | TCQuiz                        |
       | Description           | This quiz is a TCQuiz         |
       | Administer TCQuiz     | Yes                           |
-      | Default question time | 60                            |
+      | Default question time | 30                            |
     And I add a "True/False" question to the "TCQuiz" quiz with:
       | Question name                      | First question              |
       | Question text                      | Is this the first question? |
       | Correct answer                     | True                        |
     And I am on the "TCQuiz" "mod_quiz > View" page
-    #As a teacher the TCQ start screen should be displayed
+    # As a teacher the TCQ start screen should be displayed.
     Then I should see "Start new quiz session"
     When I log out
     And I am on the "TCQuiz" "mod_quiz > View" page logged in as "student"
     Then I should see "Wait until your teacher gives you the code."
     And "Join quiz" "button" should be visible
 
-    # Test that backup and restore keeps the setting.
+    # Test that backup and restore keeps the settings.
     When I log out
-    Given I am on the "Course 1" "Course" page logged in as "teacher"
+    And I am on the "Course 1" "Course" page logged in as "teacher"
     And I turn editing mode on
     And I duplicate "TCQuiz" activity editing the new copy with:
       | Name | TCQuiz1 |
-    #And I follow "TCQuiz1"
-    #What is below is the same as the mod_quiz backup feature but it doesn't work
-    #There seems to be a bug in that feature as the copy of the quiz (Quiz 2) should be
-    #checked in line 32
-    #When I log out
-    #And I am on the "TCQuiz1" "mod_quiz > View" page logged in as "student"
-    #Then I should see "Wait until your teacher gives you the code."
-    When I am on the "TCQuiz1" "quiz activity editing" page logged in as "teacher"
+    And I am on the "TCQuiz1" "quiz activity editing" page
     And I expand all fieldsets
     Then the "Administer TCQuiz" select box should contain "Yes"
+    And the field "Default question time" matches value "30"
+    And I log out
