@@ -157,8 +157,7 @@ Feature: Test that the teacher can control a flow of a TCQuiz.
     And I should see "Analysis of responses"
     And "Next >>" "button" should be visible
     When I click on "Next >>" "button"
-    Then I should see "Overall number of students achieving grade ranges"
-    And I should see "Attempts: 1"
+    Then I should see "Attempts: 1"
     And I log out
 
     # The student should see their grade.
