@@ -74,7 +74,6 @@ class tcquiz_statistics_report extends quiz_statistics_report {
             $reporturl->param('whichtries', $whichtries);
         }
 
-        var_dump($whichattempts);
         // Find out current groups mode.
         $currentgroup = $this->get_current_group($cm, $course, $this->context);
         $nostudentsingroup = false; // True if a group is selected and there is no one in it.

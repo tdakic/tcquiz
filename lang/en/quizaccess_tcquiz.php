@@ -69,6 +69,7 @@ $string['question'] = 'Question ';
 $string['questiondonewaitforresults'] = "Question done - waiting for results.";
 $string['questiontime'] = 'Default question time';
 $string['questiontime_help'] = 'The default time (in seconds) to display each question.';
+$string['questiontimeretriveerror'] = 'Could not retrieve question time. Using default.';
 $string['quiznotrunning'] = 'Quiz not running at the moment - wait for your teacher to start it';
 $string['reconnectquiz'] = 'Reconnect to quiz';
 $string['reconnectinstruct'] = 'The quiz is already running - you can connect to this session and take control of it.';

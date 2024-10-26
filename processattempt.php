@@ -24,8 +24,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-
 use quizaccess_tcquiz\tcquiz_attempt;
 
 require_once(__DIR__ . '/../../../../config.php');
@@ -63,7 +61,6 @@ try {
     }
 }
 
-
 $quizid = $attemptobj->get_quizid();
 $page = $thispage;
 
@@ -75,9 +72,14 @@ if (!$session = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid
     throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
-// If the state of the quiz is different than TCQUIZ_STATUS_SHOWQUESTION =  20 or TCQUIZ_STATUS_PREVIEWQUESTION = 15
-// defined in locallib.php possible timing issues? Is sleep(1) below enough to fix them?
-if ($session->status != TCQUIZ_STATUS_PREVIEWQUESTION  && $session->status != TCQUIZ_STATUS_SHOWQUESTION) {
+// TCQUIZ_STATUS_SHOWQUESTION =  20 or TCQUIZ_STATUS_PREVIEWQUESTION = 15 defined in locallib.php.
+// Possible timing issues? Is sleep(1) enough to fix them?
+// Decided to allow submissions if the time just expired (2 sec past expity).
+// Moodle seems to want timestamps to be ints. The student can get the question $pollinginterval after the
+// teacher + their computer can be slower/faster than the teachers. TCQUIZ_GRACE_PERIOD defined in locallib.php.
+$graceperiod = (time() - $session->nextendtime <= TCQUIZ_GRACE_PERIOD && time() - $session->nextendtime >= 0);
+
+if (!$graceperiod && $session->status != TCQUIZ_STATUS_PREVIEWQUESTION  && $session->status != TCQUIZ_STATUS_SHOWQUESTION) {
     throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 // If they are trying to access a different page than what the DB is allowing.
@@ -121,9 +123,18 @@ $attemptobj->process_auto_save($timenow);
 $status = $attemptobj->process_attempt_tcq($timenow, $thispage);
 
 if (!$attemptobj->is_preview_user()) {
-    $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php',
+    // The state of the quiz could have changed since the attempt was processed.
+    // Show results if it is close to the end of the question time?
+    $session = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid]);
+    if ($session->status == TCQUIZ_STATUS_SHOWRESULTS) {
+        $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',
+            ['page' => $page, 'showall' => 0, 'attempt' => $attemptid,
+            'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]), ENT_NOQUOTES);
+    } else {
+        $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/attempt.php',
           ['page' => $page, 'showall' => false, 'attempt' => $attemptid,
            'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]), ENT_NOQUOTES);
+    }
     header("Location: ". $url);
     exit;
 } else {

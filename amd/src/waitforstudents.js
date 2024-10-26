@@ -42,6 +42,7 @@ const registerEventListeners = (sessionid, quizid, cmid, attemptid, POLLING_INTE
   const nextQuestionAction = document.querySelector(Selectors.actions.nextButton);
   nextQuestionAction.addEventListener('click', async(e) => {
           e.preventDefault();
+          nextQuestionAction.disabled = true;
           clearInterval(updateNumStudentsEvent);
 
           var result = await fetch(M.cfg.wwwroot + '/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getquestion&quizid='

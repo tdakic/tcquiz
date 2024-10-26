@@ -32,12 +32,15 @@ const Selectors = {
  },
 };
 
-const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL) => {
+const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, timeForQuestion, studentTimer, POLLING_INTERVAL) => {
 // The timer can be stoped either by the teacher or expired time -- handle both events.
 // Enough to check when the state of the quiz has changed to show results (30).
 
+    var timeLeftHTML = document.querySelector(Selectors.regions.timeLeft);
+
     $('#responseform').on('submit', function() {
         $('#responseformsubmit').attr('disabled', 'disabled');
+        studentTimer.terminate();
     });
 
     // This should prevent "Unsaved changes" pop-up which might happen if the student typed something
@@ -46,25 +49,22 @@ const registerEventListeners = (sessionid, quizid, cmid, attemptid, page, timeFo
       event.stopImmediatePropagation();
     });
 
-    var timeLeft = timeForQuestion; // +1 to wait for everyone?
-    var timeLeftHTML = document.querySelector(Selectors.regions.timeLeft);
     var teacherEndedQuestion = false;
 
-    // Timer
-    var timer = setInterval(function() {
-        timeLeft--;
-        timeLeftHTML.innerHTML = timeLeft;
-        if (timeLeft <= 0 || teacherEndedQuestion) {
-          clearInterval(timer);
-          timer = null;
+    studentTimer.onmessage = function(event) {
+        timeLeftHTML.innerHTML = event.data;
+        if (event.data == 0 || teacherEndedQuestion) {
+          timeLeftHTML.innerHTML = 0;
+          $('#responseformsubmit').attr('disabled', 'disabled'); // Disable submissions.
+          studentTimer.terminate();
           clearInterval(tecaherEndedQuestionEvent);
           tecaherEndedQuestionEvent = null;
           timeLeftHTML.innerHTML = 0;
           document.goToCurrentQuizPageEvent = setInterval(async() => {
-              await goToCurrentQuizPage(sessionid, quizid, cmid, attemptid);
+             await goToCurrentQuizPage(sessionid, quizid, cmid, attemptid);
           }, POLLING_INTERVAL);
         }
-    }, 1000);
+    };
 
     // Checks for teacher ending the question event.
     var tecaherEndedQuestionEvent = setInterval(async function() {
@@ -181,5 +181,30 @@ function updateQuizPage(responseXMLText) {
 
 export const init = (sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL) => {
 
-  registerEventListeners(sessionid, quizid, cmid, attemptid, page, timeForQuestion, POLLING_INTERVAL);
+  var studentTimer = new Worker('./timer.js');
+  const URL_Q_TIME = M.cfg.wwwroot + '/mod/quiz/accessrule/tcquiz/get_question_time_left.php?quizid='
+    + quizid + '&sessionid=' + sessionid + '&cmid=' + cmid + '&attempt=' + attemptid
+    + '&sesskey=' + M.cfg.sesskey;
+
+
+  fetch(URL_Q_TIME, {method: 'POST'}).then((response) => {
+          if (!response.ok) {
+              throw new Error(getString('questiontimeretriveerror', 'quizaccess_tcquiz'));
+          }
+          return response.text();
+      }).then((text) => {
+          studentTimer.postMessage({'timeForQuestion': Math.max(0, text)});
+          return text;
+      }).catch((error) => {
+          // It is better to have the timer going then not. -3 seconds chosen randomly, as it seems
+          // that sometimes the student can be 2 sec behind the teacher.
+          studentTimer.postMessage({'timeForQuestion': timeForQuestion - 3});
+          Notification.addNotification({
+            message: error,
+            type: 'error'
+          });
+      });
+
+
+  registerEventListeners(sessionid, quizid, cmid, attemptid, page, timeForQuestion, studentTimer, POLLING_INTERVAL);
 };

@@ -26,18 +26,18 @@ const Selectors = {
     actions: {
         nextquestionButtonR: '[data-action="quizaccess_tcquiz/next-question_in_review_button"]',
     },
-
 };
 
 const registerEventListeners = (sessionid, quizid, cmid, attemptid, page) => {
 
   const nextQuestionAction = document.querySelector(Selectors.actions.nextquestionButtonR);
+
   nextQuestionAction.addEventListener('click', async(e) => {
           e.preventDefault();
           // The page of the quiz attempt that will be displayed is detrmined by quizdatateacher.php.
           // This is left here for possible error checking additions later.
           page++;
-
+          nextQuestionAction.disabled = true; // The techer should not click twice on the button.
           var result = await fetch(M.cfg.wwwroot
             + '/mod/quiz/accessrule/tcquiz/quizdatateacher.php?requesttype=getquestion&quizid='
             + quizid + '&cmid=' + cmid + '&attempt=' + attemptid

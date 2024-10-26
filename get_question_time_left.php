@@ -38,7 +38,7 @@ $cmid = required_param('cmid', PARAM_INT);
 
 // Add privilege checks??? what should be checked - using this at the wrong time?
 // A lot DB querries (because of polling) for nothing ???
-// What if someone knows the state of the questions? Doesn't sound like a big deal.
+// What if someone knows when the question ends? Doesn't sound like a big deal.
 
 // In case the user crashed.
 if (!confirm_sesskey()) {
@@ -48,4 +48,8 @@ if (!confirm_sesskey()) {
 $session = $DB->get_record('quizaccess_tcquiz_session', ['id' => $sessionid]);
 
 header('content-type: text');
-echo $session->currentpagestate;
+if ($session->nextendtime - time() > 0) {
+    echo $session->nextendtime - time();
+} else {
+    echo 0;
+}

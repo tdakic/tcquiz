@@ -44,6 +44,7 @@ foreach ($constdata as $key => $value) {
 /** Quiz showing results define('TCQUIZ_STATUS_SHOWRESULTS', 30); */
 /** Quiz showing the final results define('TCQUIZ_STATUS_FINALRESULTS', 40); */
 /** Quiz is finished - can't be interacted with define('TCQUIZ_STATUS_FINISHED', 50); */
+/** TCQUIZ_GRACE_PERIOD - The time between the question ending and the student still allowed to submit. */
 
 /**
  * Output the response start

@@ -70,11 +70,21 @@ if (!$tcquizsession = $DB->get_record('quizaccess_tcquiz_session', ['id' => $ses
     throw new moodle_exception('nosession', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
 
+/* If the state of the session has just changed to SHOW_RESULTS display the results. */
+if ($tcquizsession->status == TCQUIZ_STATUS_SHOWRESULTS &&  $tcquizsession->nextendtime - time() <= 1) {
+    $url = htmlspecialchars_decode(new moodle_url('/mod/quiz/accessrule/tcquiz/review_tcq.php',
+          ['page' => $page, 'showall' => 0, 'attempt' => $attemptid,
+          'sessionid' => $sessionid, 'cmid' => $cmid, 'quizid' => $quizid ]), ENT_NOQUOTES);
+    header("Location: ". $url);
+    exit;
+}
+
 /*  If the state of the quiz is different than TCQUIZ_STATUS_SHOWQUESTION =  20 or TCQUIZ_STATUS_PREVIEWQUESTION = 15
-    defined in locallib.php they shouldn't be attempting the quiz page */
+    defined in locallib.php they shouldn't be attempting the quiz page. */
 if ($tcquizsession->status != TCQUIZ_STATUS_PREVIEWQUESTION  && $tcquizsession->status != TCQUIZ_STATUS_SHOWQUESTION) {
     throw new moodle_exception('notrightquizstate', 'quizaccess_tcquiz', $attemptobj->view_url());
 }
+
 // They are trying to access a different page than what the DB is allowing.
 if ($tcquizsession->currentpage != $page) {
     throw new moodle_exception('notcurrentpage', 'quizaccess_tcquiz', $attemptobj->view_url());

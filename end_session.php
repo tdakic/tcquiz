@@ -54,15 +54,33 @@ if (!$quizobj->is_preview_user() || $session->teacherid != $USER->id) {
 $session->status = TCQUIZ_STATUS_FINISHED;
 $DB->update_record('quizaccess_tcquiz_session', $session);
 
-$sql = "SELECT * FROM {quizaccess_tcquiz_attempt} qta WHERE sessionid = :sessionid";
+$sql = "SELECT attemptid FROM {quizaccess_tcquiz_attempt} qta WHERE sessionid = :sessionid";
 $attemptids = $DB->get_records_sql($sql, ['sessionid' => $sessionid]);
 
 // Close al attempts associated with the session - includes STUDENT attempts.
+
 foreach ($attemptids as $attemptid) {
     $attempt = $DB->get_record('quiz_attempts', ['id' => intval($attemptid->attemptid)]);
     if ( $attempt && $attempt->state != \mod_quiz\quiz_attempt::FINISHED) {
-        $attempt->state = \mod_quiz\quiz_attempt::FINISHED;
-        $DB->update_record('quiz_attempts', $attempt); // FIXME - not update all fields or or add timestamps? Submit the attempts?
+        // Grade the attempt.
+        try {
+            $attemptobj = tcquiz_attempt::create($attemptid->attemptid);
+        } catch (moodle_exception $e) {
+            if (!empty($cmid)) {
+                list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
+                $continuelink = new moodle_url('/mod/quiz/view.php', ['id' => $cmid]);
+                $context = context_module::instance($cm->id);
+                if (has_capability('mod/quiz:preview', $context)) {
+                    throw new moodle_exception('attempterrorcontentchange', 'quiz', $continuelink);
+                } else {
+                    throw new moodle_exception('attempterrorcontentchangeforuser', 'quiz', $continuelink);
+                }
+            } else {
+                throw new moodle_exception('attempterrorinvalid', 'quiz');
+            }
+        }
+        $attemptobj->process_finish_tcq(time());
+        // End grade attempt.
     }
 }
 
